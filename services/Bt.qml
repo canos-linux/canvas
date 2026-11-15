@@ -1,33 +1,34 @@
-import QtQuick
+pragma Singleton
 import Quickshell
 import Quickshell.Io
-import "../../core"
-import "."
+import QtQuick
 
-Pill {
-    id: bt
+Singleton {
+    id: root
     property bool powered: false
     property string device: ""
+    property string icon: !powered ? "󰂲" : device !== "" ? "󰂱" : "󰂯"
+    property string label: !powered ? "Aus" : device !== "" ? device : "An"
 
-    icon: !powered ? "󰂲" : device !== "" ? "󰂱" : "󰂯"
-    iconColor: !powered ? Theme.subtext : device !== "" ? Theme.accent : Theme.text
-    label: !powered ? "Aus" : device !== "" ? device : "An"
+    function toggle() {
+        toggleProc.running = true
+    }
 
     Process {
         id: query
         command: ["sh", "-c", "bluetoothctl show | grep -q 'Powered: yes' && echo ON; bluetoothctl devices Connected"]
         stdout: StdioCollector {
             onStreamFinished: {
-                bt.powered = text.indexOf("ON") === 0
+                root.powered = text.indexOf("ON") === 0
                 const line = text.split("\n").find(l => l.startsWith("Device "))
-                bt.device = line ? line.split(" ").slice(2).join(" ") : ""
+                root.device = line ? line.split(" ").slice(2).join(" ") : ""
             }
         }
     }
 
     Process {
-        id: toggle
-        command: ["bluetoothctl", "power", bt.powered ? "off" : "on"]
+        id: toggleProc
+        command: ["bluetoothctl", "power", root.powered ? "off" : "on"]
         onExited: query.running = true
     }
 
@@ -37,12 +38,5 @@ Pill {
         repeat: true
         triggeredOnStart: true
         onTriggered: query.running = true
-    }
-
-    TapHandler {
-        onTapped: {
-            toggle.running = true
-            bt.flash()
-        }
     }
 }
