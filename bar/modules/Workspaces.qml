@@ -2,11 +2,11 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import Quickshell.Hyprland
-import "../core"
+import "../../core"
 
 Row {
     id: ws
-    spacing: 6
+    spacing: 7
     property int active: 1
     property var occupied: []
 
@@ -49,9 +49,9 @@ Row {
             property bool hasWindows: ws.occupied.indexOf(num) !== -1
 
             anchors.verticalCenter: parent.verticalCenter
-            width: isActive ? 30 : dotHover.hovered ? 16 : 10
-            height: 10
-            radius: 5
+            width: isActive ? 34 : dotHover.hovered ? 18 : 12
+            height: 12
+            radius: 6
             color: isActive ? Theme.accent : hasWindows ? Theme.subtext : Theme.surfaceHigh
 
             Behavior on width { NumberAnimation { duration: 350; easing.type: Easing.OutBack } }

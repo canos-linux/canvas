@@ -1,22 +1,25 @@
 import QtQuick
 import "../core"
+import "modules"
 
 Rectangle {
     id: island
-    default property alias content: row.data
+    property var modules: []
+    property var barWindow
     property bool solid: true
     property int delay: 0
 
-    implicitWidth: row.implicitWidth + 28
-    implicitHeight: 34
+    visible: row.implicitWidth > 0
+    implicitWidth: row.implicitWidth + 32
+    implicitHeight: 40
     radius: height / 2
     color: solid ? Theme.base : "transparent"
     border.width: solid ? 1 : 0
     border.color: Theme.alpha(Theme.accent, hover.hovered ? 0.6 : 0.2)
     opacity: 0
-    scale: hover.hovered ? 1.04 : 1
+    scale: hover.hovered ? 1.03 : 1
 
-    transform: Translate { id: shift; y: -40 }
+    transform: Translate { id: shift; y: -50 }
 
     Behavior on implicitWidth { NumberAnimation { duration: 300; easing.type: Easing.OutCubic } }
     Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutBack } }
@@ -27,7 +30,20 @@ Rectangle {
     Row {
         id: row
         anchors.centerIn: parent
-        spacing: 12
+        spacing: 16
+
+        Repeater {
+            model: island.modules
+            Loader {
+                anchors.verticalCenter: parent.verticalCenter
+                source: Qt.resolvedUrl("modules/" + modelData.charAt(0).toUpperCase() + modelData.slice(1) + ".qml")
+                visible: item !== null && (item.shown === undefined || item.shown)
+                onLoaded: {
+                    if (item.barWindow !== undefined)
+                        item.barWindow = island.barWindow
+                }
+            }
+        }
     }
 
     SequentialAnimation {

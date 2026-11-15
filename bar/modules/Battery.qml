@@ -1,11 +1,10 @@
 import QtQuick
 import Quickshell.Services.UPower
-import "../core"
+import "../../core"
 
 Row {
     id: bat
-    spacing: 6
-    anchors.verticalCenter: parent.verticalCenter
+    spacing: 7
 
     property real raw: UPower.displayDevice.percentage
     property int percent: Math.round(raw > 1 ? raw : raw * 100)
@@ -14,19 +13,19 @@ Row {
 
     Rectangle {
         anchors.verticalCenter: parent.verticalCenter
-        width: 22
-        height: 11
-        radius: 3
+        width: 26
+        height: 13
+        radius: 4
         color: "transparent"
         border.width: 1.5
         border.color: Theme.subtext
 
         Rectangle {
-            x: 2.5
-            y: 2.5
-            height: parent.height - 5
-            width: Math.max(2, (parent.width - 5) * bat.percent / 100)
-            radius: 1.5
+            x: 3
+            y: 3
+            height: parent.height - 6
+            width: Math.max(2, (parent.width - 6) * bat.percent / 100)
+            radius: 2
             color: bat.fillColor
             Behavior on width { NumberAnimation { duration: 500 } }
             SequentialAnimation on opacity {
@@ -43,6 +42,7 @@ Row {
         text: bat.percent + "%"
         color: Theme.text
         font.family: Theme.font
-        font.pixelSize: 13
+        font.pixelSize: 14
+        font.weight: Font.Medium
     }
 }
