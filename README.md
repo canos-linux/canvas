@@ -1,12 +1,12 @@
 # Canvas
 
-Die Oberfläche von **CanOS** – gebaut mit Quickshell für Hyprland.
+The desktop shell of **CanOS**, built with Quickshell for Hyprland.
 
-- Living Island: Uhr, Musik, Lautstärke, Benachrichtigungen
-- Control-Center, Launcher, Theme-Switcher
-- Lockscreen, Live-Wallpaper, Glas-Look
+- Living Island: clock, music, volume, brightness, notifications
+- Control center, app launcher, theme switcher
+- Lock screen, live wallpaper, glass look
 
-## Starten
+## Run
 
 ```
 qs -p shell.qml
