@@ -75,13 +75,13 @@ Item {
         const list = []
         if (raw.startsWith(">")) {
             const cmd = raw.slice(1).trim()
-            if (cmd !== "") list.push({ kind: "cmd", name: "Befehl ausführen", sub: cmd, glyph: "󰆍", value: cmd })
+            if (cmd !== "") list.push({ kind: "cmd", name: Lang.t.runCommand, sub: cmd, glyph: "󰆍", value: cmd })
         } else if (raw.startsWith("?")) {
             const term = raw.slice(1).trim()
-            if (term !== "") list.push({ kind: "web", name: "Im Web suchen", sub: term, glyph: "󰖟", value: term })
+            if (term !== "") list.push({ kind: "web", name: Lang.t.searchWeb, sub: term, glyph: "󰖟", value: term })
         } else {
             const result = calc(q.startsWith("=") ? q.slice(1).trim() : q)
-            if (result !== null) list.push({ kind: "calc", name: String(result).replace(".", ","), sub: "Enter kopiert das Ergebnis", glyph: "󰃬", value: String(result) })
+            if (result !== null) list.push({ kind: "calc", name: Lang.num(result), sub: Lang.t.calcHint, glyph: "󰃬", value: String(result) })
             const apps = DesktopEntries.applications.values.filter(e => !e.noDisplay)
             let ranked
             if (q === "") {
@@ -166,7 +166,7 @@ Item {
             Txt {
                 visible: input.text === ""
                 anchors.verticalCenter: parent.verticalCenter
-                text: "Apps suchen …   = rechnen   > Befehl   ? Web"
+                text: Lang.t.launcherHint
                 size: 16
                 color: Theme.subtext
                 opacity: 0.7

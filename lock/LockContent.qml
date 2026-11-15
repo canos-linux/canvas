@@ -58,7 +58,7 @@ Item {
         }
         Txt {
             anchors.horizontalCenter: parent.horizontalCenter
-            text: clock.date.toLocaleString(Qt.locale("de_AT"), "dddd, d. MMMM")
+            text: clock.date.toLocaleString(Lang.locale, Lang.t.dateLong)
             size: 22
             color: Theme.subtext
         }
@@ -100,7 +100,7 @@ Item {
             anchors.left: avatar.right
             anchors.leftMargin: 16
             anchors.verticalCenter: parent.verticalCenter
-            text: lc.status === "wrong" ? "Falsches Passwort" : "Passwort eingeben"
+            text: lc.status === "wrong" ? Lang.t.pwWrong : Lang.t.pwEnter
             size: 16
             color: lc.status === "wrong" ? "#ff6b6b" : Theme.subtext
         }
@@ -166,7 +166,7 @@ Item {
         Txt {
             visible: lc.preview
             anchors.verticalCenter: parent.verticalCenter
-            text: "Vorschau · Esc schließt"
+            text: Lang.t.lockPreviewHint
             size: 14
             color: Theme.subtext
         }

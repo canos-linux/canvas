@@ -32,7 +32,7 @@ Item {
 
         Txt {
             anchors.verticalCenter: parent.verticalCenter
-            text: idle.hovered ? clock.date.toLocaleString(Qt.locale("de_AT"), "ddd dd.MM.") + "   " + Qt.formatTime(clock.date, "HH:mm") : Qt.formatTime(clock.date, "HH:mm")
+            text: idle.hovered ? clock.date.toLocaleString(Lang.locale, Lang.t.dateShort) + "   " + Qt.formatTime(clock.date, "HH:mm") : Qt.formatTime(clock.date, "HH:mm")
             size: 15
             weight: Font.DemiBold
         }

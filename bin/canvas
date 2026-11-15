@@ -22,6 +22,6 @@ case "$1" in
         qs -p "$dir/shell.qml" ipc call island notify "${2:-Canvas}" "${3:-Test}" "${4:-}"
         ;;
     *)
-        echo "canvas start|stop|restart|log|launcher|themes|center|settings|lock|lockpreview|notify <app> <titel> <text>"
+        echo "canvas start|stop|restart|log|launcher|themes|center|settings|lock|lockpreview|notify <app> <title> <text>"
         ;;
 esac

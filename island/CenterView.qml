@@ -40,7 +40,7 @@ Item {
                     weight: Font.Bold
                 }
                 Txt {
-                    text: clock.date.toLocaleString(Qt.locale("de_AT"), "dddd, d. MMMM")
+                    text: clock.date.toLocaleString(Lang.locale, Lang.t.dateLong)
                     size: 13
                     color: Theme.subtext
                 }
@@ -85,7 +85,7 @@ Item {
             Tile {
                 width: (parent.width - 20) / 3
                 icon: Net.icon
-                title: "WLAN"
+                title: Lang.t.wifi
                 sub: Net.label
                 active: Net.connected
                 onClicked: Net.openSettings()
@@ -94,14 +94,14 @@ Item {
                 width: (parent.width - 20) / 3
                 icon: Bt.icon
                 title: "Bluetooth"
-                sub: Bt.label
+                sub: !Bt.powered ? Lang.t.off : Bt.device !== "" ? Bt.device : Lang.t.on
                 active: Bt.powered
                 onClicked: Bt.toggle()
             }
             Tile {
                 width: (parent.width - 20) / 3
                 icon: "󰌌"
-                title: "Tastatur"
+                title: Lang.t.keyboard
                 sub: Hypr.layout
                 active: true
                 onClicked: Hypr.nextLayout()
@@ -226,7 +226,7 @@ Item {
                 width: parent.width
                 height: 20
                 Txt {
-                    text: "Benachrichtigungen"
+                    text: Lang.t.notifications
                     size: 13
                     weight: Font.DemiBold
                     color: Theme.subtext
@@ -234,7 +234,7 @@ Item {
                 Txt {
                     id: clearText
                     anchors.right: parent.right
-                    text: "Alle löschen"
+                    text: Lang.t.clearAll
                     size: 12
                     color: clearArea.containsMouse ? Theme.accent : Theme.subtext
                     MouseArea {
@@ -369,7 +369,7 @@ Item {
             }
             RoundButton {
                 icon: Config.opt.dnd ? "󰂛" : "󰂚"
-                label: "Ruhe"
+                label: Lang.t.quiet
                 active: Config.opt.dnd
                 onClicked: Config.opt.dnd = !Config.opt.dnd
             }

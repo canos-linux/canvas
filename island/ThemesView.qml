@@ -157,7 +157,7 @@ FocusScope {
             }
             Txt {
                 anchors.verticalCenter: parent.verticalCenter
-                text: "aktuell: " + CurrentTheme.name
+                text: Lang.t.themesCurrent + CurrentTheme.name
                 size: 13
                 color: Theme.subtext
             }
@@ -271,7 +271,7 @@ FocusScope {
                     color: card.modelData.color
                     Txt {
                         anchors.centerIn: parent
-                        text: "aktiv"
+                        text: Lang.t.themesActive
                         size: 11
                         weight: Font.DemiBold
                         color: "#111111"
@@ -336,7 +336,7 @@ FocusScope {
 
         Txt {
             anchors.horizontalCenter: parent.horizontalCenter
-            text: tv.pinWrong ? "Falsche PIN" : "PIN eingeben"
+            text: tv.pinWrong ? Lang.t.pinWrong : Lang.t.pinEnter
             size: 16
             weight: Font.DemiBold
             color: tv.pinWrong ? "#ff6b6b" : Theme.text
@@ -389,7 +389,7 @@ FocusScope {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
         anchors.bottomMargin: 18
-        text: "←  →  wählen     Enter  anwenden     R  Zufall     Esc  schließen" + (tv.unlocked ? "     Rechtsklick  privat an/aus" : "")
+        text: Lang.t.themesHint + (tv.unlocked ? Lang.t.themesHintPrivate : "")
         size: 12
         color: Theme.subtext
     }

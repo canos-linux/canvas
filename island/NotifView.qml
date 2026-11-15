@@ -19,7 +19,7 @@ Item {
                 hoverable: false
             }
             Txt {
-                text: IslandState.notifApp + "  ·  jetzt"
+                text: IslandState.notifApp + "  ·  " + Lang.t.now
                 size: 12
                 color: Theme.subtext
             }

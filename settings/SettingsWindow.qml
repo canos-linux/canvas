@@ -8,7 +8,7 @@ LazyLoader {
 
     FloatingWindow {
         id: win
-        title: "Canvas Einstellungen"
+        title: Lang.t.settingsTitle
         implicitWidth: 820
         implicitHeight: 580
         color: Theme.base
@@ -16,11 +16,11 @@ LazyLoader {
 
         property int page: 0
         property var pages: [
-            { icon: "󰏘", name: "Aussehen" },
-            { icon: "󱂬", name: "Island" },
-            { icon: "󰕮", name: "Control-Center" },
-            { icon: "󰒓", name: "Canvas-Teile" },
-            { icon: "󰋼", name: "Über" }
+            { icon: "󰏘", name: Lang.t.pageLook },
+            { icon: "󱂬", name: Lang.t.pageIsland },
+            { icon: "󰕮", name: Lang.t.pageCenter },
+            { icon: "󰒓", name: Lang.t.pageParts },
+            { icon: "󰋼", name: Lang.t.pageAbout }
         ]
 
         Rectangle {
@@ -55,7 +55,7 @@ LazyLoader {
                     Column {
                         anchors.verticalCenter: parent.verticalCenter
                         Txt { text: "Canvas"; size: 17; weight: Font.Bold }
-                        Txt { text: "Einstellungen"; size: 12; color: Theme.subtext }
+                        Txt { text: Lang.t.settings; size: 12; color: Theme.subtext }
                     }
                 }
 
@@ -122,13 +122,23 @@ LazyLoader {
                     width: parent.width
                     visible: win.page === 0
                     SettingRow {
-                        title: "Glas-Look"
-                        sub: "Island, Control-Center und Launcher werden durchsichtig mit Blur."
+                        title: Lang.t.language
+                        sub: Lang.t.languageSub
+                        Segmented {
+                            options: ["English", "Deutsch"]
+                            values: ["en", "de"]
+                            value: Lang.code
+                            onPicked: v => Config.opt.language = v
+                        }
+                    }
+                    SettingRow {
+                        title: Lang.t.glass
+                        sub: Lang.t.glassSub
                         Toggle { checked: Config.opt.glass; onToggled: v => Config.opt.glass = v }
                     }
                     SettingRow {
-                        title: "Glas-Deckkraft"
-                        sub: "Wie stark der Hintergrund durchscheint."
+                        title: Lang.t.glassOpacity
+                        sub: Lang.t.glassOpacitySub
                         opacity: Config.opt.glass ? 1 : 0.4
                         Slider {
                             width: 200
@@ -137,10 +147,10 @@ LazyLoader {
                         }
                     }
                     SettingRow {
-                        title: "Animationen"
-                        sub: "Geschwindigkeit aller Canvas-Animationen."
+                        title: Lang.t.animations
+                        sub: Lang.t.animationsSub
                         Segmented {
-                            options: ["Normal", "Schnell", "Aus"]
+                            options: Lang.t.animOptions
                             values: ["normal", "fast", "off"]
                             value: Config.opt.animations
                             onPicked: v => Config.opt.animations = v
@@ -152,23 +162,23 @@ LazyLoader {
                     width: parent.width
                     visible: win.page === 1
                     SettingRow {
-                        title: "Datum beim Drüberfahren"
-                        sub: "Die kleine Island zeigt zusätzlich das Datum."
+                        title: Lang.t.hoverDate
+                        sub: Lang.t.hoverDateSub
                         Toggle { checked: Config.opt.hoverDate; onToggled: v => Config.opt.hoverDate = v }
                     }
                     SettingRow {
-                        title: "Musik nach Pause"
-                        sub: "Wie lange die Musik-Ansicht nach einer Pause sichtbar bleibt."
+                        title: Lang.t.musicLinger
+                        sub: Lang.t.musicLingerSub
                         Segmented {
-                            options: ["Aus", "8 s", "30 s"]
+                            options: [Lang.t.off, "8 s", "30 s"]
                             values: [0, 8, 30]
                             value: Config.opt.musicLinger
                             onPicked: v => Config.opt.musicLinger = v
                         }
                     }
                     SettingRow {
-                        title: "Benachrichtigungen"
-                        sub: "Wie lange eine Benachrichtigung in der Island bleibt."
+                        title: Lang.t.notifications
+                        sub: Lang.t.notifDurationSub
                         Segmented {
                             options: ["3 s", "5 s", "8 s"]
                             values: [3, 5, 8]
@@ -177,8 +187,8 @@ LazyLoader {
                         }
                     }
                     SettingRow {
-                        title: "Nicht stören"
-                        sub: "Benachrichtigungen landen nur im Verlauf."
+                        title: Lang.t.dnd
+                        sub: Lang.t.dndSub
                         Toggle { checked: Config.opt.dnd; onToggled: v => Config.opt.dnd = v }
                     }
                 }
@@ -187,13 +197,13 @@ LazyLoader {
                     width: parent.width
                     visible: win.page === 2
                     SettingRow {
-                        title: "Musik-Visualizer"
-                        sub: "Balken neben dem Song in der Island und im Control-Center."
+                        title: Lang.t.visualizer
+                        sub: Lang.t.visualizerSub
                         Toggle { checked: Config.opt.visualizer; onToggled: v => Config.opt.visualizer = v }
                     }
                     SettingRow {
-                        title: "System-Ringe"
-                        sub: "CPU, RAM und Temperatur im Control-Center."
+                        title: Lang.t.rings
+                        sub: Lang.t.ringsSub
                         Toggle { checked: Config.opt.systemRings; onToggled: v => Config.opt.systemRings = v }
                     }
                 }
@@ -203,35 +213,35 @@ LazyLoader {
                     visible: win.page === 3
                     Txt {
                         width: parent.width
-                        text: "Diese Teile übernehmen Aufgaben von Serpantinum. Erst einschalten, wenn Serpantinum aus ist – sonst kommen sich beide in die Quere."
+                        text: Lang.t.partsInfo
                         size: 13
                         color: Theme.subtext
                         wrapMode: Text.WordWrap
                         bottomPadding: 8
                     }
                     SettingRow {
-                        title: "Wallpaper"
-                        sub: "Live-Wallpaper vom aktuellen Theme, pausiert wenn Fenster offen sind."
+                        title: Lang.t.wallpaper
+                        sub: Lang.t.wallpaperSub
                         Toggle { checked: Config.opt.wallpaper; onToggled: v => Config.opt.wallpaper = v }
                     }
                     SettingRow {
-                        title: "Benachrichtigungen empfangen"
-                        sub: "Canvas wird zum Benachrichtigungs-Dienst."
+                        title: Lang.t.notifReceive
+                        sub: Lang.t.notifReceiveSub
                         Toggle { checked: Config.opt.notifications; onToggled: v => Config.opt.notifications = v }
                     }
                     SettingRow {
-                        title: "Eigene Farben"
-                        sub: "Canvas berechnet die Theme-Farben selbst (matugen) statt sie von Serpantinum zu übernehmen."
+                        title: Lang.t.ownColors
+                        sub: Lang.t.ownColorsSub
                         Toggle { checked: Config.opt.ownColors; onToggled: v => Config.opt.ownColors = v }
                     }
                     SettingRow {
-                        title: "Lockscreen"
-                        sub: "Super + L sperrt mit dem Canvas-Lockscreen. Aus = nur Vorschau."
+                        title: Lang.t.lockscreen
+                        sub: Lang.t.lockscreenSub
                         Toggle { checked: Config.opt.lockscreen; onToggled: v => Config.opt.lockscreen = v }
                     }
                     SettingRow {
-                        title: "Lockscreen-Vorschau"
-                        sub: "Zeigt den Lockscreen, ohne wirklich zu sperren. Esc schließt."
+                        title: Lang.t.lockPreview
+                        sub: Lang.t.lockPreviewSub
                         Rectangle {
                             width: 110
                             height: 34
@@ -239,7 +249,7 @@ LazyLoader {
                             color: previewArea.containsMouse ? Theme.accent : Theme.surfaceHigh
                             Txt {
                                 anchors.centerIn: parent
-                                text: "Anzeigen"
+                                text: Lang.t.show
                                 weight: Font.Medium
                                 color: previewArea.containsMouse ? Theme.base : Theme.text
                             }
@@ -257,9 +267,9 @@ LazyLoader {
                     width: parent.width
                     visible: win.page === 4
                     spacing: 8
-                    Txt { text: "Canvas – die Oberfläche von CanOS"; size: 16; weight: Font.DemiBold }
-                    Txt { text: "Gebaut mit Quickshell. Einstellungen liegen in ~/.config/canvas/settings.json."; size: 13; color: Theme.subtext }
-                    Txt { text: "Shortcuts: Super + Alt + D Launcher · Super + T Themes"; size: 13; color: Theme.subtext }
+                    Txt { text: Lang.t.aboutTitle; size: 16; weight: Font.DemiBold }
+                    Txt { text: Lang.t.aboutBuilt; size: 13; color: Theme.subtext }
+                    Txt { text: Lang.t.aboutShortcuts; size: 13; color: Theme.subtext }
                 }
             }
         }

@@ -19,6 +19,7 @@ Singleton {
 
         JsonAdapter {
             id: adapter
+            property string language: "en"
             property bool glass: false
             property real glassOpacity: 0.55
             property string animations: "normal"
