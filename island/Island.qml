@@ -8,11 +8,12 @@ PanelWindow {
     id: win
     property bool expanded: false
     property bool hovered: hover.hovered
-    property string mode: expanded ? "center" : IslandState.temp !== "" ? IslandState.temp : Media.playing ? "music" : "idle"
+    property string mode: expanded ? "center" : IslandState.temp !== "" ? IslandState.temp : Media.recent && Media.player ? "music" : "idle"
     property var sizes: ({
         idle: [hovered ? 250 : 130, 38],
         music: [400, 50],
         volume: [310, 44],
+        brightness: [310, 44],
         ws: [200, 38],
         notif: [370, 96],
         center: [500, Media.player ? 520 : 434]
@@ -73,14 +74,16 @@ PanelWindow {
         Behavior on border.color { ColorAnimation { duration: 300 } }
 
         HoverHandler { id: hover }
-        TapHandler {
+        MouseArea {
+            anchors.fill: parent
             enabled: !win.expanded
-            onTapped: win.expanded = true
+            onClicked: win.expanded = true
         }
 
         View { on: win.mode === "idle"; IdleView { anchors.fill: parent; hovered: win.hovered } }
         View { on: win.mode === "music"; MusicView { anchors.fill: parent } }
         View { on: win.mode === "volume"; VolumeView { anchors.fill: parent } }
+        View { on: win.mode === "brightness"; BrightnessView { anchors.fill: parent } }
         View { on: win.mode === "ws"; WsView { anchors.fill: parent } }
         View { on: win.mode === "notif"; NotifView { anchors.fill: parent } }
         View { on: win.mode === "center"; CenterView { anchors.fill: parent; win: win } }

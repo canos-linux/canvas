@@ -19,6 +19,7 @@ Row {
             Behavior on color { ColorAnimation { duration: 250 } }
             HoverHandler { id: dotHover }
             TapHandler {
+                gesturePolicy: TapHandler.ReleaseWithinBounds
                 enabled: parent.parent.clickable
                 onTapped: Hypr.focus(num)
             }

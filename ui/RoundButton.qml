@@ -47,5 +47,5 @@ Item {
     }
 
     HoverHandler { id: hov }
-    TapHandler { id: tap; onTapped: btn.clicked() }
+    TapHandler { id: tap; gesturePolicy: TapHandler.ReleaseWithinBounds; onTapped: btn.clicked() }
 }

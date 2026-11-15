@@ -10,7 +10,19 @@ Singleton {
         const list = Mpris.players.values
         for (let i = 0; i < list.length; i++)
             if (list[i].isPlaying) return list[i]
+        if (lastPlayer && list.indexOf(lastPlayer) !== -1) return lastPlayer
         return list.length > 0 ? list[0] : null
+    }
+    property var lastPlayer: null
+    property bool recent: playing || pauseTimer.running
+    onPlayingChanged: {
+        if (playing) lastPlayer = player
+        else pauseTimer.restart()
+    }
+
+    Timer {
+        id: pauseTimer
+        interval: 8000
     }
     property bool playing: player !== null && player.isPlaying
     property string title: player ? player.trackTitle : ""

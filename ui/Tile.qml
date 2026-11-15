@@ -17,7 +17,7 @@ Rectangle {
     Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutBack } }
 
     HoverHandler { id: hov }
-    TapHandler { id: tap; onTapped: tile.clicked() }
+    TapHandler { id: tap; gesturePolicy: TapHandler.ReleaseWithinBounds; onTapped: tile.clicked() }
 
     Row {
         anchors.left: parent.left

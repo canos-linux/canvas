@@ -38,6 +38,13 @@ Singleton {
     }
 
     Connections {
+        target: Brightness
+        function onBumped() {
+            if (root.temp !== "notif") root.flash("brightness", 1600)
+        }
+    }
+
+    Connections {
         target: Hypr
         function onSwitched() {
             if (root.temp !== "volume" && root.temp !== "notif") root.flash("ws", 1100)

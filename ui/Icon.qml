@@ -13,5 +13,5 @@ Text {
     Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutBack } }
     Behavior on color { ColorAnimation { duration: 250 } }
     HoverHandler { id: hov }
-    TapHandler { id: tap; onTapped: icon.clicked() }
+    TapHandler { id: tap; gesturePolicy: TapHandler.ReleaseWithinBounds; onTapped: icon.clicked() }
 }
