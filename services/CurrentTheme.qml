@@ -37,9 +37,9 @@ Singleton {
             dir = ""
         } else if (Edition.priv) {
             dir = home + "/Themes/" + name
-        } else {
-            finder.running = false
-            finder.running = true
+        } else if (themes.length > 0) {
+            const t = themes.find(x => x.name === name) || themes.find(x => x.name === "canvas") || themes[0]
+            dir = t.dir
         }
     }
 
@@ -56,14 +56,6 @@ Singleton {
         }
         name = t.name
         Quickshell.execDetached(["sh", "-c", "mkdir -p \"$(dirname \"$1\")\" && printf '%s' \"$2\" > \"$1\"", "sh", statePath, t.name])
-    }
-
-    Process {
-        id: finder
-        command: ["sh", "-c", "n=\"$1\"; shift; for r in \"$@\"; do if [ -f \"$r/$n/theme.json\" ]; then echo \"$r/$n\"; exit 0; fi; done", "sh", root.name].concat(root.roots)
-        stdout: StdioCollector {
-            onStreamFinished: root.dir = text.trim()
-        }
     }
 
     Process {
@@ -84,6 +76,7 @@ Singleton {
                 }
                 if (!Edition.priv) list.sort((a, b) => a.name === "canvas" ? -1 : b.name === "canvas" ? 1 : a.name.localeCompare(b.name))
                 root.themes = list
+                root.resolve()
             }
         }
     }

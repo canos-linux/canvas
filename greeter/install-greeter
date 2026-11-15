@@ -5,7 +5,7 @@ cat > /etc/greetd/config.toml <<'EOF'
 vt = 1
 
 [default_session]
-command = "cage -s -- env XDG_CACHE_HOME=/tmp/canos-greeter qs -p /usr/share/canvas/greeter/shell.qml"
+command = "cage -s -- env QT_WAYLAND_DISABLE_WINDOWDECORATION=1 XDG_CACHE_HOME=/tmp/canos-greeter qs -p /usr/share/canvas/greeter/shell.qml"
 user = "greeter"
 EOF
 ln -sf /usr/lib/systemd/system/greetd.service /etc/systemd/system/display-manager.service
