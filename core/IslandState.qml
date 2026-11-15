@@ -9,6 +9,7 @@ Singleton {
     property string notifApp: ""
     property string notifTitle: ""
     property string notifBody: ""
+    property bool dnd: false
 
     function flash(kind, ms) {
         temp = kind
@@ -17,6 +18,7 @@ Singleton {
     }
 
     function notify(app, title, body) {
+        if (dnd) return
         notifApp = app
         notifTitle = title
         notifBody = body

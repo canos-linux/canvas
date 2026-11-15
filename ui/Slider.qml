@@ -4,6 +4,8 @@ import "../core"
 Item {
     id: slider
     property real value: 0
+    property real shown: value
+    Behavior on shown { NumberAnimation { duration: drag.pressed ? 0 : 200 } }
     signal moved(real v)
     implicitHeight: 24
 
@@ -16,11 +18,10 @@ Item {
         Behavior on height { NumberAnimation { duration: 150 } }
 
         Rectangle {
-            width: Math.max(parent.height, parent.width * slider.value)
+            width: Math.max(parent.height, parent.width * slider.shown)
             height: parent.height
             radius: height / 2
             color: Theme.accent
-            Behavior on width { NumberAnimation { duration: drag.pressed ? 0 : 200 } }
         }
     }
 

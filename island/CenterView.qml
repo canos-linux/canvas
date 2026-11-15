@@ -181,38 +181,123 @@ Item {
             }
         }
 
+        Row {
+            width: parent.width
+            spacing: 12
+            Icon {
+                anchors.verticalCenter: parent.verticalCenter
+                text: "󰃠"
+                size: 21
+                onClicked: Brightness.set(Brightness.value > 0.5 ? 0.3 : 1)
+            }
+            Slider {
+                anchors.verticalCenter: parent.verticalCenter
+                width: parent.width - 90
+                value: Brightness.value
+                onMoved: v => Brightness.set(v)
+            }
+            Txt {
+                anchors.verticalCenter: parent.verticalCenter
+                width: 44
+                horizontalAlignment: Text.AlignRight
+                text: Math.round(Brightness.value * 100) + "%"
+                weight: Font.Medium
+            }
+        }
+
         Item {
             width: parent.width
-            height: 28
-
-            WsDots { anchors.verticalCenter: parent.verticalCenter }
+            height: 74
 
             Row {
+                spacing: 6
+                Ring { label: "CPU"; value: Sys.cpu; text: Math.round(Sys.cpu * 100) + "%" }
+                Ring { label: "RAM"; value: Sys.ram; text: Math.round(Sys.ram * 100) + "%" }
+                Ring {
+                    label: "Temp"
+                    value: (Sys.temp - 30) / 60
+                    text: Math.round(Sys.temp) + "°"
+                    tint: Sys.temp > 80 ? "#ff6b6b" : Theme.accent
+                }
+            }
+
+            Column {
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: 12
-                Repeater {
-                    model: SystemTray.items
-                    Item {
-                        width: 20
-                        height: 20
-                        IconImage {
-                            anchors.fill: parent
-                            source: modelData.icon
-                        }
-                        MouseArea {
-                            anchors.fill: parent
-                            acceptedButtons: Qt.LeftButton | Qt.RightButton
-                            onClicked: mouse => {
-                                if (mouse.button === Qt.LeftButton && !modelData.onlyMenu) {
-                                    modelData.activate()
-                                } else if (modelData.hasMenu) {
-                                    const p = mapToItem(null, 0, height)
-                                    modelData.display(center.win, p.x, p.y + 8)
+
+                WsDots { anchors.right: parent.right }
+
+                Row {
+                    anchors.right: parent.right
+                    spacing: 12
+                    Repeater {
+                        model: SystemTray.items
+                        Item {
+                            width: 20
+                            height: 20
+                            IconImage {
+                                anchors.fill: parent
+                                source: modelData.icon
+                            }
+                            MouseArea {
+                                anchors.fill: parent
+                                acceptedButtons: Qt.LeftButton | Qt.RightButton
+                                onClicked: mouse => {
+                                    if (mouse.button === Qt.LeftButton && !modelData.onlyMenu) {
+                                        modelData.activate()
+                                    } else if (modelData.hasMenu) {
+                                        const p = mapToItem(null, 0, height)
+                                        modelData.display(center.win, p.x, p.y + 8)
+                                    }
                                 }
                             }
                         }
                     }
+                }
+            }
+        }
+
+        Row {
+            anchors.horizontalCenter: parent.horizontalCenter
+            spacing: (parent.width - 5 * 64) / 4
+
+            RoundButton {
+                icon: "󰹑"
+                label: "Screenshot"
+                onClicked: {
+                    center.win.expanded = false
+                    Quickshell.execDetached(["sh", "-c", "sleep 0.6; mkdir -p ~/Pictures/Screenshots; f=~/Pictures/Screenshots/$(date +%Y-%m-%d_%H-%M-%S).png; grim \"$f\" && wl-copy < \"$f\" && notify-send 'Screenshot' 'Gespeichert und kopiert'"])
+                }
+            }
+            RoundButton {
+                icon: "󰏘"
+                label: "Themes"
+                onClicked: {
+                    center.win.expanded = false
+                    Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/theme-picker"])
+                }
+            }
+            RoundButton {
+                icon: "󰊴"
+                label: "Gacha"
+                onClicked: {
+                    center.win.expanded = false
+                    Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/theme-gacha"])
+                }
+            }
+            RoundButton {
+                icon: IslandState.dnd ? "󰂛" : "󰂚"
+                label: "Ruhe"
+                active: IslandState.dnd
+                onClicked: IslandState.dnd = !IslandState.dnd
+            }
+            RoundButton {
+                icon: "󰐥"
+                label: "Power"
+                onClicked: {
+                    center.win.expanded = false
+                    Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/power-menu"])
                 }
             }
         }

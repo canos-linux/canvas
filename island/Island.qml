@@ -15,7 +15,7 @@ PanelWindow {
         volume: [310, 44],
         ws: [200, 38],
         notif: [370, 96],
-        center: [500, Media.player ? 420 : 340]
+        center: [500, Media.player ? 520 : 434]
     })
 
     anchors {
@@ -23,7 +23,7 @@ PanelWindow {
         left: true
         right: true
     }
-    implicitHeight: 480
+    implicitHeight: 560
     exclusiveZone: 54
     color: "transparent"
     mask: Region { item: island }
@@ -32,6 +32,11 @@ PanelWindow {
         windows: [win]
         active: win.expanded
         onCleared: win.expanded = false
+    }
+
+    onExpandedChanged: {
+        Sys.active = expanded
+        if (expanded) Brightness.refresh()
     }
 
     component View: Item {
