@@ -15,8 +15,17 @@ Item {
         precision: SystemClock.Minutes
     }
 
+    Binding {
+        target: IslandState
+        property: "centerHeight"
+        value: col.implicitHeight + 44
+    }
+
     Column {
-        anchors.fill: parent
+        id: col
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
         anchors.margins: 22
         spacing: 16
 
@@ -55,15 +64,17 @@ Item {
                 }
 
                 Icon {
-                    id: gear
                     anchors.verticalCenter: parent.verticalCenter
                     text: "󰒓"
                     size: 20
                     color: Theme.accent
                     rotation: gearHover.hovered ? 90 : 0
-                    Behavior on rotation { NumberAnimation { duration: 400; easing.type: Easing.OutBack } }
+                    Behavior on rotation { NumberAnimation { duration: Theme.dur(400); easing.type: Easing.OutBack } }
                     HoverHandler { id: gearHover }
-                    onClicked: Quickshell.execDetached(["xdg-open", Config.path])
+                    onClicked: {
+                        center.win.setExpanded(false)
+                        IslandState.settingsOpen = true
+                    }
                 }
             }
         }
@@ -122,12 +133,36 @@ Item {
             }
         }
 
+        Row {
+            width: parent.width
+            spacing: 12
+            Icon {
+                anchors.verticalCenter: parent.verticalCenter
+                text: "󰃠"
+                size: 21
+                onClicked: Brightness.set(Brightness.value > 0.5 ? 0.3 : 1)
+            }
+            Slider {
+                anchors.verticalCenter: parent.verticalCenter
+                width: parent.width - 90
+                value: Brightness.value
+                onMoved: v => Brightness.set(v)
+            }
+            Txt {
+                anchors.verticalCenter: parent.verticalCenter
+                width: 44
+                horizontalAlignment: Text.AlignRight
+                text: Math.round(Brightness.value * 100) + "%"
+                weight: Font.Medium
+            }
+        }
+
         Rectangle {
             visible: Media.player !== null
             width: parent.width
             height: 70
             radius: 22
-            color: Theme.surface
+            color: Theme.card
 
             Row {
                 anchors.left: parent.left
@@ -172,6 +207,7 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: 14
                 Visualizer {
+                    visible: Config.opt.visualizer
                     anchors.verticalCenter: parent.verticalCenter
                     maxHeight: 24
                 }
@@ -181,35 +217,83 @@ Item {
             }
         }
 
-        Row {
+        Column {
+            visible: Notifs.history.length > 0
             width: parent.width
-            spacing: 12
-            Icon {
-                anchors.verticalCenter: parent.verticalCenter
-                text: "󰃠"
-                size: 21
-                onClicked: Brightness.set(Brightness.value > 0.5 ? 0.3 : 1)
+            spacing: 8
+
+            Item {
+                width: parent.width
+                height: 20
+                Txt {
+                    text: "Benachrichtigungen"
+                    size: 13
+                    weight: Font.DemiBold
+                    color: Theme.subtext
+                }
+                Txt {
+                    id: clearText
+                    anchors.right: parent.right
+                    text: "Alle löschen"
+                    size: 12
+                    color: clearArea.containsMouse ? Theme.accent : Theme.subtext
+                    MouseArea {
+                        id: clearArea
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        onClicked: Notifs.clear()
+                    }
+                }
             }
-            Slider {
-                anchors.verticalCenter: parent.verticalCenter
-                width: parent.width - 90
-                value: Brightness.value
-                onMoved: v => Brightness.set(v)
-            }
-            Txt {
-                anchors.verticalCenter: parent.verticalCenter
-                width: 44
-                horizontalAlignment: Text.AlignRight
-                text: Math.round(Brightness.value * 100) + "%"
-                weight: Font.Medium
+
+            Repeater {
+                model: Notifs.history.slice(0, 3)
+                Rectangle {
+                    width: parent.width
+                    height: 54
+                    radius: 16
+                    color: Theme.card
+
+                    Row {
+                        anchors.left: parent.left
+                        anchors.leftMargin: 14
+                        anchors.verticalCenter: parent.verticalCenter
+                        spacing: 12
+                        Icon {
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: "󰂚"
+                            size: 18
+                            color: Theme.accent
+                            hoverable: false
+                        }
+                        Column {
+                            anchors.verticalCenter: parent.verticalCenter
+                            Txt {
+                                width: 380
+                                text: modelData.title
+                                size: 13
+                                weight: Font.DemiBold
+                                elide: Text.ElideRight
+                            }
+                            Txt {
+                                width: 380
+                                text: modelData.app + " · " + modelData.time + (modelData.body ? "  —  " + modelData.body : "")
+                                size: 11
+                                color: Theme.subtext
+                                elide: Text.ElideRight
+                            }
+                        }
+                    }
+                }
             }
         }
 
         Item {
             width: parent.width
-            height: 74
+            height: Config.opt.systemRings ? 74 : 30
 
             Row {
+                visible: Config.opt.systemRings
                 spacing: 6
                 Ring { label: "CPU"; value: Sys.cpu; text: Math.round(Sys.cpu * 100) + "%" }
                 Ring { label: "RAM"; value: Sys.ram; text: Math.round(Sys.ram * 100) + "%" }
@@ -266,37 +350,34 @@ Item {
                 icon: "󰹑"
                 label: "Screenshot"
                 onClicked: {
-                    center.win.expanded = false
+                    center.win.setExpanded(false)
                     Quickshell.execDetached(["sh", "-c", "sleep 0.6; mkdir -p ~/Pictures/Screenshots; f=~/Pictures/Screenshots/$(date +%Y-%m-%d_%H-%M-%S).png; grim \"$f\" && wl-copy < \"$f\" && notify-send 'Screenshot' 'Gespeichert und kopiert'"])
                 }
             }
             RoundButton {
                 icon: "󰏘"
                 label: "Themes"
-                onClicked: {
-                    center.win.expanded = false
-                    Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/theme-picker"])
-                }
+                onClicked: IslandState.overlay = "themes"
             }
             RoundButton {
                 icon: "󰊴"
                 label: "Gacha"
                 onClicked: {
-                    center.win.expanded = false
+                    center.win.setExpanded(false)
                     Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/theme-gacha"])
                 }
             }
             RoundButton {
-                icon: IslandState.dnd ? "󰂛" : "󰂚"
+                icon: Config.opt.dnd ? "󰂛" : "󰂚"
                 label: "Ruhe"
-                active: IslandState.dnd
-                onClicked: IslandState.dnd = !IslandState.dnd
+                active: Config.opt.dnd
+                onClicked: Config.opt.dnd = !Config.opt.dnd
             }
             RoundButton {
                 icon: "󰐥"
                 label: "Power"
                 onClicked: {
-                    center.win.expanded = false
+                    center.win.setExpanded(false)
                     Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/power-menu"])
                 }
             }

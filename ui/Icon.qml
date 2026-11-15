@@ -16,6 +16,7 @@ Text {
         id: area
         anchors.fill: parent
         anchors.margins: -4
+        enabled: icon.hoverable
         hoverEnabled: true
         onClicked: icon.clicked()
     }

@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+dir="$HOME/CanOS/canvas"
+case "$1" in
+    start)
+        pgrep -f "qs -p $dir/shell.qml" >/dev/null || setsid -f qs -p "$dir/shell.qml" >/tmp/canvas.log 2>&1
+        ;;
+    stop)
+        qs kill -p "$dir/shell.qml" >/dev/null 2>&1
+        ;;
+    restart)
+        qs kill -p "$dir/shell.qml" >/dev/null 2>&1
+        sleep 0.5
+        setsid -f qs -p "$dir/shell.qml" >/tmp/canvas.log 2>&1
+        ;;
+    log)
+        cat /tmp/canvas.log
+        ;;
+    launcher|themes|center|settings|lock|lockpreview)
+        qs -p "$dir/shell.qml" ipc call island "$1"
+        ;;
+    notify)
+        qs -p "$dir/shell.qml" ipc call island notify "${2:-Canvas}" "${3:-Test}" "${4:-}"
+        ;;
+    *)
+        echo "canvas start|stop|restart|log|launcher|themes|center|settings|lock|lockpreview|notify <app> <titel> <text>"
+        ;;
+esac

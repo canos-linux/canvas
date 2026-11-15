@@ -14,7 +14,8 @@ Singleton {
         return list.length > 0 ? list[0] : null
     }
     property var lastPlayer: null
-    property bool recent: playing || pauseTimer.running
+    property int linger: 8
+    property bool recent: playing || (linger > 0 && pauseTimer.running)
     onPlayingChanged: {
         if (playing) lastPlayer = player
         else pauseTimer.restart()
@@ -22,7 +23,7 @@ Singleton {
 
     Timer {
         id: pauseTimer
-        interval: 8000
+        interval: Math.max(1, root.linger) * 1000
     }
     property bool playing: player !== null && player.isPlaying
     property string title: player ? player.trackTitle : ""

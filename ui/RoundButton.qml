@@ -16,7 +16,7 @@ Item {
         width: 48
         height: 48
         radius: 24
-        color: btn.active ? Theme.accent : hov.hovered ? Theme.alpha(Theme.accent, 0.25) : Theme.surface
+        color: btn.active ? Theme.accent : hov.hovered ? Theme.alpha(Theme.accent, 0.25) : Theme.card
         scale: tap.pressed ? 0.88 : hov.hovered ? 1.1 : 1
         Behavior on color { ColorAnimation { duration: 200 } }
         Behavior on scale { NumberAnimation { duration: 220; easing.type: Easing.OutBack } }

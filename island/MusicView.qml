@@ -56,6 +56,7 @@ Item {
         spacing: 14
 
         Visualizer {
+            visible: Config.opt.visualizer
             anchors.verticalCenter: parent.verticalCenter
             maxHeight: 22
         }

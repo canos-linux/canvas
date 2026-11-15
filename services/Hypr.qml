@@ -9,6 +9,8 @@ Singleton {
     property int active: 1
     property var occupied: []
     property string layout: "DE"
+    property string focusedMonitor: ""
+    property var busy: ({})
     property int last: -1
     signal switched()
 
@@ -29,7 +31,7 @@ Singleton {
 
     Process {
         id: wsQuery
-        command: ["sh", "-c", "hyprctl -j activeworkspace; echo '|||'; hyprctl -j workspaces"]
+        command: ["sh", "-c", "hyprctl -j activeworkspace; echo '|||'; hyprctl -j workspaces; echo '|||'; hyprctl -j monitors"]
         stdout: StdioCollector {
             onStreamFinished: {
                 const parts = text.split("|||")
@@ -39,7 +41,16 @@ Singleton {
                     root.last = id
                     root.active = id
                 }
-                root.occupied = JSON.parse(parts[1]).filter(w => w.id > 0 && w.windows > 0).map(w => w.id)
+                const spaces = JSON.parse(parts[1])
+                root.occupied = spaces.filter(w => w.id > 0 && w.windows > 0).map(w => w.id)
+                const monitors = JSON.parse(parts[2])
+                const map = {}
+                for (const m of monitors) {
+                    if (m.focused) root.focusedMonitor = m.name
+                    const ws = spaces.find(w => w.id === m.activeWorkspace.id)
+                    map[m.name] = (ws && ws.windows > 0) || (m.specialWorkspace && m.specialWorkspace.name !== "")
+                }
+                root.busy = map
             }
         }
     }
@@ -68,7 +79,7 @@ Singleton {
         parser: SplitParser {
             onRead: data => {
                 if (data.startsWith("activelayout")) kbQuery.running = true
-                else if (/^(workspace|createworkspace|destroyworkspace|openwindow|closewindow|movewindow|focusedmon)/.test(data)) refresh.restart()
+                else if (/^(workspace|createworkspace|destroyworkspace|openwindow|closewindow|movewindow|focusedmon|activespecial|changefloatingmode)/.test(data)) refresh.restart()
             }
         }
     }

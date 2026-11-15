@@ -11,7 +11,7 @@ Rectangle {
 
     implicitHeight: 64
     radius: 20
-    color: active ? Theme.alpha(Theme.accent, hov.hovered ? 0.32 : 0.2) : hov.hovered ? Theme.surfaceHigh : Theme.surface
+    color: active ? Theme.alpha(Theme.accent, hov.hovered ? 0.32 : 0.2) : hov.hovered ? Theme.surfaceHigh : Theme.card
     scale: tap.pressed ? 0.94 : 1
     Behavior on color { ColorAnimation { duration: 200 } }
     Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutBack } }

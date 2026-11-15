@@ -2,6 +2,7 @@ pragma Singleton
 import Quickshell
 import Quickshell.Io
 import QtQuick
+import "../services"
 
 Singleton {
     id: root
@@ -15,6 +16,10 @@ Singleton {
     property string font: "Google Sans Flex"
     property string iconFont: "Iosevka Nerd Font Propo"
 
+    property real speed: Config.opt.animations === "off" ? 0 : Config.opt.animations === "fast" ? 0.6 : 1
+    property color panel: Config.opt.glass ? alpha(base, Config.opt.glassOpacity) : base
+    property color card: Config.opt.glass ? alpha(surface, 0.55) : surface
+
     Behavior on base { ColorAnimation { duration: 600 } }
     Behavior on surface { ColorAnimation { duration: 600 } }
     Behavior on surfaceHigh { ColorAnimation { duration: 600 } }
@@ -27,8 +32,58 @@ Singleton {
         return Qt.rgba(c.r, c.g, c.b, a)
     }
 
+    function dur(ms) {
+        return Math.round(ms * speed)
+    }
+
+    function applyColors(c) {
+        base = c.base
+        surface = c.surface
+        surfaceHigh = c.surfaceHigh
+        text = c.text
+        subtext = c.subtext
+        accent = c.accent
+        accent2 = c.accent2
+    }
+
+    Process {
+        id: matugen
+        command: ["sh", "-c", "d=\"$1\"; if [ -f \"$d/matugen.png\" ]; then i=\"$d/matugen.png\"; t=scheme-fidelity; else i=\"$d/lock.png\"; t=scheme-tonal-spot; fi; matugen image \"$i\" -m dark -t $t --json hex --dry-run --prefer saturation 2>/dev/null", "sh", CurrentTheme.dir]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try {
+                    const c = JSON.parse(text).colors
+                    const g = k => c[k].dark.color
+                    root.applyColors({
+                        base: g("surface_container_lowest"),
+                        surface: g("surface_container"),
+                        surfaceHigh: g("surface_container_high"),
+                        text: g("on_surface"),
+                        subtext: g("on_surface_variant"),
+                        accent: g("primary"),
+                        accent2: g("secondary")
+                    })
+                } catch (e) {}
+            }
+        }
+    }
+
+    Connections {
+        target: CurrentTheme
+        function onDirChanged() {
+            if (Config.opt.ownColors && CurrentTheme.dir !== "") matugen.running = true
+        }
+    }
+
+    Connections {
+        target: Config.opt
+        function onOwnColorsChanged() {
+            if (Config.opt.ownColors && CurrentTheme.dir !== "") matugen.running = true
+        }
+    }
+
     FileView {
-        path: Quickshell.env("HOME") + "/.local/state/serpantinum/qs_colors.json"
+        path: Config.opt.ownColors ? "" : Quickshell.env("HOME") + "/.local/state/serpantinum/qs_colors.json"
         watchChanges: true
         onFileChanged: reload()
         onLoaded: {

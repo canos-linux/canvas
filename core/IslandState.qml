@@ -9,7 +9,13 @@ Singleton {
     property string notifApp: ""
     property string notifTitle: ""
     property string notifBody: ""
-    property bool dnd: false
+    property string overlay: ""
+    property string expandedScreen: ""
+    property bool settingsOpen: false
+    property bool locked: false
+    property bool lockPreview: false
+    property int launcherRows: 0
+    property real centerHeight: 400
 
     function flash(kind, ms) {
         temp = kind
@@ -18,11 +24,26 @@ Singleton {
     }
 
     function notify(app, title, body) {
-        if (dnd) return
+        Notifs.add(app, title, body)
+        if (Config.opt.dnd) return
         notifApp = app
         notifTitle = title
         notifBody = body
-        flash("notif", 5000)
+        flash("notif", Config.opt.notifDuration * 1000)
+    }
+
+    function closeAll() {
+        overlay = ""
+        expandedScreen = ""
+    }
+
+    function toggleOverlay(name) {
+        overlay = overlay === name ? "" : name
+    }
+
+    function lock() {
+        if (Config.opt.lockscreen) locked = true
+        else lockPreview = true
     }
 
     Timer {
@@ -47,7 +68,7 @@ Singleton {
     Connections {
         target: Hypr
         function onSwitched() {
-            if (root.temp !== "volume" && root.temp !== "notif") root.flash("ws", 1100)
+            if (root.temp !== "volume" && root.temp !== "notif" && root.temp !== "brightness") root.flash("ws", 1100)
         }
     }
 }
