@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-dir="$HOME/CanOS/canvas"
+dir="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
+[ -f "$dir/shell.qml" ] || dir="/usr/share/canvas"
 if [ -z "$CANVAS_EDITION" ]; then
     if [ -f "$HOME/.config/canvas/private.json" ]; then export CANVAS_EDITION=private; else export CANVAS_EDITION=community; fi
 fi

@@ -1,0 +1,15 @@
+#!/bin/bash
+# Runs inside the installed system (Calamares shellprocess).
+cat > /etc/greetd/config.toml <<'EOF'
+[terminal]
+vt = 1
+
+[default_session]
+command = "cage -s -- env XDG_CACHE_HOME=/tmp/canos-greeter qs -p /usr/share/canvas/greeter/shell.qml"
+user = "greeter"
+EOF
+ln -sf /usr/lib/systemd/system/greetd.service /etc/systemd/system/display-manager.service
+rm -f /etc/sudoers.d/g_wheel
+rm -f /etc/polkit-1/rules.d/49-nopasswd_global.rules
+rm -f /usr/share/applications/canos-installer.desktop
+exit 0

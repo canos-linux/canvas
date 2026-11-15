@@ -108,6 +108,8 @@ Singleton {
         back: "Back",
         next: "Next",
         letsGo: "Let's go",
+        install: "Install CanOS",
+        liveHint: "You're running CanOS live. Install it to keep everything.",
         aboutTitle: "Canvas – the interface of CanOS",
         aboutBuilt: "Built with Quickshell. Settings are stored in ~/.config/canvas/settings.json.",
         aboutShortcuts: "Shortcuts: Super + Alt + D Launcher · Super + T Themes"
@@ -209,6 +211,8 @@ Singleton {
         back: "Zurück",
         next: "Weiter",
         letsGo: "Los geht's",
+        install: "CanOS installieren",
+        liveHint: "Du nutzt CanOS gerade live. Installier es, damit alles bleibt.",
         aboutTitle: "Canvas – die Oberfläche von CanOS",
         aboutBuilt: "Gebaut mit Quickshell. Einstellungen liegen in ~/.config/canvas/settings.json.",
         aboutShortcuts: "Shortcuts: Super + Alt + D Launcher · Super + T Themes"

@@ -16,6 +16,7 @@ LazyLoader {
         color: Theme.base
         property int step: 0
         readonly property int steps: 4
+        readonly property bool live: Quickshell.env("USER") === "liveuser"
 
         function finish() {
             Config.opt.welcomeDone = true
@@ -257,9 +258,19 @@ LazyLoader {
                     }
                     Txt {
                         anchors.horizontalCenter: parent.horizontalCenter
-                        text: Lang.t.welcomeReady
+                        text: win.live ? Lang.t.liveHint : Lang.t.welcomeReady
                         size: 15
                         color: Theme.subtext
+                    }
+                    Pill {
+                        visible: win.live
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        primary: true
+                        label: Lang.t.install
+                        onClicked: {
+                            Quickshell.execDetached(["sh", "-c", "sudo -E calamares"])
+                            win.finish()
+                        }
                     }
                 }
             }
