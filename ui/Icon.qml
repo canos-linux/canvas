@@ -9,9 +9,14 @@ Text {
     color: Theme.text
     font.family: Theme.iconFont
     font.pixelSize: size
-    scale: tap.pressed ? 0.85 : hoverable && hov.hovered ? 1.2 : 1
+    scale: area.pressed ? 0.85 : hoverable && area.containsMouse ? 1.2 : 1
     Behavior on scale { NumberAnimation { duration: 200; easing.type: Easing.OutBack } }
     Behavior on color { ColorAnimation { duration: 250 } }
-    HoverHandler { id: hov }
-    TapHandler { id: tap; gesturePolicy: TapHandler.ReleaseWithinBounds; onTapped: icon.clicked() }
+    MouseArea {
+        id: area
+        anchors.fill: parent
+        anchors.margins: -4
+        hoverEnabled: true
+        onClicked: icon.clicked()
+    }
 }
