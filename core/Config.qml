@@ -2,11 +2,17 @@ pragma Singleton
 import Quickshell
 import Quickshell.Io
 import QtQuick
+import "../services"
 
 Singleton {
     id: root
     readonly property string path: Quickshell.env("HOME") + "/.config/canvas/settings.json"
     property alias opt: adapter
+    readonly property bool wallpaperOn: !Edition.priv || adapter.wallpaper
+    readonly property bool notificationsOn: !Edition.priv || adapter.notifications
+    readonly property bool lockOn: !Edition.priv || adapter.lockscreen
+    readonly property bool ownColorsOn: !Edition.priv || adapter.ownColors
+    readonly property bool clipboardOn: !Edition.priv && adapter.clipboard
 
     FileView {
         path: root.path
@@ -20,6 +26,9 @@ Singleton {
         JsonAdapter {
             id: adapter
             property string language: "en"
+            property int idleLock: 10
+            property bool clipboard: true
+            property bool welcomeDone: false
             property bool glass: false
             property real glassOpacity: 0.55
             property string animations: "normal"

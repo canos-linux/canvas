@@ -90,7 +90,7 @@ Item {
             color: Theme.surfaceHigh
             Image {
                 anchors.fill: parent
-                source: CurrentTheme.dir !== "" ? "file://" + CurrentTheme.dir + "/face.png" : ""
+                source: CurrentTheme.face !== "" ? "file://" + CurrentTheme.face : ""
                 fillMode: Image.PreserveAspectCrop
             }
         }

@@ -344,13 +344,14 @@ Item {
 
         Row {
             anchors.horizontalCenter: parent.horizontalCenter
-            spacing: (parent.width - 5 * 64) / 4
+            spacing: (parent.width - (Edition.priv ? 5 : 4) * 64) / (Edition.priv ? 4 : 3)
 
             RoundButton {
                 icon: "󰹑"
                 label: "Screenshot"
                 onClicked: {
                     center.win.setExpanded(false)
+                    if (!Edition.priv) { IslandState.startShot(); return }
                     Quickshell.execDetached(["sh", "-c", "sleep 0.6; mkdir -p ~/Pictures/Screenshots; f=~/Pictures/Screenshots/$(date +%Y-%m-%d_%H-%M-%S).png; grim \"$f\" && wl-copy < \"$f\" && notify-send 'Screenshot' 'Gespeichert und kopiert'"])
                 }
             }
@@ -362,6 +363,7 @@ Item {
             RoundButton {
                 icon: "󰊴"
                 label: "Gacha"
+                visible: Edition.priv
                 onClicked: {
                     center.win.setExpanded(false)
                     Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/theme-gacha"])
@@ -377,6 +379,7 @@ Item {
                 icon: "󰐥"
                 label: "Power"
                 onClicked: {
+                    if (!Edition.priv) { IslandState.overlay = "power"; return }
                     center.win.setExpanded(false)
                     Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/power-menu"])
                 }

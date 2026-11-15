@@ -12,6 +12,9 @@ Singleton {
     property string overlay: ""
     property string expandedScreen: ""
     property bool settingsOpen: false
+    property bool welcomeOpen: false
+    property bool shooting: false
+    property string launcherPrefix: ""
     property bool locked: false
     property bool lockPreview: false
     property int launcherRows: 0
@@ -37,12 +40,29 @@ Singleton {
         expandedScreen = ""
     }
 
+    function openClipboard() {
+        launcherPrefix = ";"
+        if (overlay === "launcher") overlay = ""
+        overlay = "launcher"
+    }
+
+    function startShot() {
+        closeAll()
+        shotTimer.restart()
+    }
+
+    Timer {
+        id: shotTimer
+        interval: 300
+        onTriggered: root.shooting = true
+    }
+
     function toggleOverlay(name) {
         overlay = overlay === name ? "" : name
     }
 
     function lock() {
-        if (Config.opt.lockscreen) locked = true
+        if (Config.lockOn) locked = true
         else lockPreview = true
     }
 

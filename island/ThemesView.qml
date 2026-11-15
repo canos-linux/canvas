@@ -9,7 +9,7 @@ import "../ui"
 FocusScope {
     id: tv
     property bool active: false
-    property var all: []
+    property var all: CurrentTheme.themes
     property var shown: unlocked ? all : all.filter(t => !t.hidden)
     property bool unlocked: false
     property bool pinMode: false
@@ -21,7 +21,7 @@ FocusScope {
         if (active) {
             unlocked = false
             pinMode = false
-            loader.running = true
+            CurrentTheme.refresh()
             focusTimer.restart()
         }
     }
@@ -39,25 +39,18 @@ FocusScope {
         }
     }
 
-    Process {
-        id: loader
-        command: ["sh", "-c", "for d in \"$HOME\"/Themes/*/; do n=$(basename \"$d\"); [ -f \"$d/theme.fish\" ] || continue; h=0; [ -f \"$d/.hidden\" ] && h=1; c=$(grep -m1 '^set grub ' \"$d/theme.fish\" | awk '{print $3}'); echo \"$n|$h|$c\"; done"]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                tv.all = text.trim().split("\n").filter(l => l !== "").map(l => {
-                    const p = l.split("|")
-                    return { name: p[0], hidden: p[1] === "1", color: p[2] ? "#" + p[2] : Theme.accent }
-                })
-                const i = tv.shown.findIndex(t => t.name === CurrentTheme.name)
-                carousel.currentIndex = Math.max(0, i)
-            }
+    Connections {
+        target: CurrentTheme
+        function onThemesChanged() {
+            const i = tv.shown.findIndex(t => t.name === CurrentTheme.name)
+            carousel.currentIndex = Math.max(0, i)
         }
     }
 
     function apply() {
         const t = shown[carousel.currentIndex]
         if (!t) return
-        Quickshell.execDetached(["fish", "-c", "theme " + t.name])
+        CurrentTheme.apply(t)
         IslandState.overlay = ""
     }
 
@@ -75,7 +68,7 @@ FocusScope {
     function toggleHidden(t) {
         const file = home + "/Themes/" + t.name + "/.hidden"
         Quickshell.execDetached(["sh", "-c", t.hidden ? "rm -f \"$1\"" : "touch \"$1\"", "sh", file])
-        loader.running = true
+        CurrentTheme.refresh()
     }
 
     function checkPin() {
@@ -174,7 +167,7 @@ FocusScope {
                 onClicked: tv.random()
             }
             Icon {
-                visible: tv.pinMd5 !== ""
+                visible: tv.pinMd5 !== "" && Edition.priv
                 anchors.verticalCenter: parent.verticalCenter
                 text: tv.unlocked ? "󰈈" : "󰈉"
                 size: 20
@@ -252,7 +245,7 @@ FocusScope {
 
                 Image {
                     anchors.fill: parent
-                    source: "file://" + tv.home + "/Themes/" + card.modelData.name + "/lock.png"
+                    source: "file://" + card.modelData.dir + "/lock.png"
                     fillMode: Image.PreserveAspectCrop
                     sourceSize.width: 480
                     asynchronous: true

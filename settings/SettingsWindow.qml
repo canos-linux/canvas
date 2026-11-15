@@ -1,6 +1,7 @@
 import QtQuick
 import Quickshell
 import "../core"
+import "../services"
 import "../ui"
 
 LazyLoader {
@@ -19,7 +20,8 @@ LazyLoader {
             { icon: "󰏘", name: Lang.t.pageLook },
             { icon: "󱂬", name: Lang.t.pageIsland },
             { icon: "󰕮", name: Lang.t.pageCenter },
-            { icon: "󰒓", name: Lang.t.pageParts },
+            { icon: "󰒓", name: Lang.t.pageParts, priv: true },
+            { icon: "󰍹", name: Lang.t.pageSystem },
             { icon: "󰋼", name: Lang.t.pageAbout }
         ]
 
@@ -64,6 +66,7 @@ LazyLoader {
                     Rectangle {
                         width: parent.width
                         height: 44
+                        visible: !modelData.priv || Edition.priv
                         radius: 14
                         color: win.page === index ? Theme.alpha(Theme.accent, 0.2) : navArea.containsMouse ? Theme.surfaceHigh : "transparent"
                         Behavior on color { ColorAnimation { duration: Theme.dur(150) } }
@@ -266,6 +269,51 @@ LazyLoader {
                 Column {
                     width: parent.width
                     visible: win.page === 4
+                    SettingRow {
+                        title: Lang.t.idleLock
+                        sub: Lang.t.idleLockSub
+                        opacity: Config.lockOn ? 1 : 0.4
+                        Segmented {
+                            options: [Lang.t.off, "5 min", "10 min"]
+                            values: [0, 5, 10]
+                            value: Config.opt.idleLock
+                            onPicked: v => Config.opt.idleLock = v
+                        }
+                    }
+                    SettingRow {
+                        visible: !Edition.priv
+                        title: Lang.t.clipboard
+                        sub: Lang.t.clipboardSub
+                        Toggle { checked: Config.opt.clipboard; onToggled: v => Config.opt.clipboard = v }
+                    }
+                    SettingRow {
+                        visible: !Edition.priv
+                        title: Lang.t.welcomeAgain
+                        sub: Lang.t.welcomeAgainSub
+                        Rectangle {
+                            width: 110
+                            height: 34
+                            radius: 17
+                            color: tourArea.containsMouse ? Theme.accent : Theme.surfaceHigh
+                            Txt {
+                                anchors.centerIn: parent
+                                text: Lang.t.show
+                                weight: Font.Medium
+                                color: tourArea.containsMouse ? Theme.base : Theme.text
+                            }
+                            MouseArea {
+                                id: tourArea
+                                anchors.fill: parent
+                                hoverEnabled: true
+                                onClicked: IslandState.welcomeOpen = true
+                            }
+                        }
+                    }
+                }
+
+                Column {
+                    width: parent.width
+                    visible: win.page === 5
                     spacing: 8
                     Txt { text: Lang.t.aboutTitle; size: 16; weight: Font.DemiBold }
                     Txt { text: Lang.t.aboutBuilt; size: 13; color: Theme.subtext }

@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 dir="$HOME/CanOS/canvas"
+if [ -z "$CANVAS_EDITION" ]; then
+    if [ -f "$HOME/.config/canvas/private.json" ]; then export CANVAS_EDITION=private; else export CANVAS_EDITION=community; fi
+fi
 case "$1" in
     start)
         pgrep -f "qs -p $dir/shell.qml" >/dev/null || setsid -f qs -p "$dir/shell.qml" >/tmp/canvas.log 2>&1
@@ -15,13 +18,17 @@ case "$1" in
     log)
         cat /tmp/canvas.log
         ;;
-    launcher|themes|center|settings|lock|lockpreview)
+    launcher|themes|center|settings|lock|lockpreview|power|clipboard|screenshot|welcome)
         qs -p "$dir/shell.qml" ipc call island "$1"
+        ;;
+    theme)
+        mkdir -p "$HOME/.local/state/canvas"
+        printf '%s' "$2" > "$HOME/.local/state/canvas/theme"
         ;;
     notify)
         qs -p "$dir/shell.qml" ipc call island notify "${2:-Canvas}" "${3:-Test}" "${4:-}"
         ;;
     *)
-        echo "canvas start|stop|restart|log|launcher|themes|center|settings|lock|lockpreview|notify <app> <title> <text>"
+        echo "canvas start|stop|restart|log|launcher|themes|center|settings|lock|lockpreview|power|clipboard|screenshot|welcome|theme <name>|notify <app> <title> <text>"
         ;;
 esac

@@ -9,7 +9,7 @@ PanelWindow {
     id: wall
     property bool busy: Hypr.busy[screen.name] === true
 
-    visible: Config.opt.wallpaper
+    visible: Config.wallpaperOn
     color: "black"
     exclusionMode: ExclusionMode.Ignore
     WlrLayershell.layer: WlrLayer.Background

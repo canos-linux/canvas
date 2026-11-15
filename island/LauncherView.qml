@@ -11,11 +11,14 @@ Item {
     property var results: []
     property int sel: 0
     property var counts: ({})
+    property var clips: []
     readonly property string usagePath: Quickshell.env("HOME") + "/.local/state/canvas/launcher.json"
 
     onActiveChanged: {
         if (active) {
-            input.text = ""
+            input.text = IslandState.launcherPrefix
+            if (IslandState.launcherPrefix === ";") clipLoader.running = true
+            IslandState.launcherPrefix = ""
             sel = 0
             update()
             focusTimer.restart()
@@ -48,6 +51,17 @@ Item {
         command: ["sh", "-c", "mkdir -p \"$(dirname \"$1\")\" && printf '%s' \"$2\" > \"$1\"", "sh", lv.usagePath, data]
     }
 
+    Process {
+        id: clipLoader
+        command: ["sh", "-c", "cliphist list 2>/dev/null | head -60"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                lv.clips = text.split("\n").filter(l => l !== "")
+                if (lv.active && input.text.startsWith(";")) lv.update()
+            }
+        }
+    }
+
     function score(entry, q) {
         const name = (entry.name || "").toLowerCase()
         const extra = ((entry.genericName || "") + " " + (entry.keywords || []).join(" ") + " " + (entry.comment || "")).toLowerCase()
@@ -76,6 +90,15 @@ Item {
         if (raw.startsWith(">")) {
             const cmd = raw.slice(1).trim()
             if (cmd !== "") list.push({ kind: "cmd", name: Lang.t.runCommand, sub: cmd, glyph: "󰆍", value: cmd })
+        } else if (raw.startsWith(";")) {
+            if (raw === ";") clipLoader.running = true
+            const term = raw.slice(1).trim().toLowerCase()
+            for (const l of lv.clips) {
+                const t = l.replace(/^[0-9]+\t/, "")
+                if (term === "" || t.toLowerCase().indexOf(term) !== -1)
+                    list.push({ kind: "clip", name: t.slice(0, 90), sub: Lang.t.clipHint, glyph: "󰅌", value: l })
+                if (list.length >= 7) break
+            }
         } else if (raw.startsWith("?")) {
             const term = raw.slice(1).trim()
             if (term !== "") list.push({ kind: "web", name: Lang.t.searchWeb, sub: term, glyph: "󰖟", value: term })
@@ -110,6 +133,8 @@ Item {
             Quickshell.execDetached(["sh", "-c", r.value])
         } else if (r.kind === "web") {
             Quickshell.execDetached(["xdg-open", "https://duckduckgo.com/?q=" + encodeURIComponent(r.value)])
+        } else if (r.kind === "clip") {
+            Quickshell.execDetached(["sh", "-c", "printf '%s' \"$1\" | cliphist decode | wl-copy", "sh", r.value])
         } else if (r.kind === "calc") {
             Quickshell.execDetached(["wl-copy", r.value])
         }
@@ -128,7 +153,7 @@ Item {
             anchors.left: parent.left
             anchors.leftMargin: 24
             anchors.verticalCenter: parent.verticalCenter
-            text: input.text.startsWith(">") ? "󰆍" : input.text.startsWith("?") ? "󰖟" : "󰍉"
+            text: input.text.startsWith(">") ? "󰆍" : input.text.startsWith("?") ? "󰖟" : input.text.startsWith(";") ? "󰅌" : "󰍉"
             size: 22
             color: Theme.accent
             hoverable: false

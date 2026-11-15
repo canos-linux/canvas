@@ -71,19 +71,19 @@ Singleton {
     Connections {
         target: CurrentTheme
         function onDirChanged() {
-            if (Config.opt.ownColors && CurrentTheme.dir !== "") matugen.running = true
+            if (Config.ownColorsOn && CurrentTheme.dir !== "") matugen.running = true
         }
     }
 
     Connections {
-        target: Config.opt
-        function onOwnColorsChanged() {
-            if (Config.opt.ownColors && CurrentTheme.dir !== "") matugen.running = true
+        target: Config
+        function onOwnColorsOnChanged() {
+            if (Config.ownColorsOn && CurrentTheme.dir !== "") matugen.running = true
         }
     }
 
     FileView {
-        path: Config.opt.ownColors ? "" : Quickshell.env("HOME") + "/.local/state/serpantinum/qs_colors.json"
+        path: Config.ownColorsOn ? "" : Quickshell.env("HOME") + "/.local/state/serpantinum/qs_colors.json"
         watchChanges: true
         onFileChanged: reload()
         onLoaded: {

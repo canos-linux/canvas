@@ -1,6 +1,7 @@
 //@ pragma UseQApplication
 import Quickshell
 import Quickshell.Io
+import Quickshell.Wayland
 import QtQuick
 import "core"
 import "services"
@@ -8,6 +9,8 @@ import "island"
 import "settings"
 import "wallpaper"
 import "lock"
+import "shot"
+import "welcome"
 
 ShellRoot {
     Variants {
@@ -18,11 +21,25 @@ ShellRoot {
             Wallpaper { screen: screenScope.modelData }
             Catcher { screen: screenScope.modelData }
             Island { screen: screenScope.modelData }
+            RegionShot { screen: screenScope.modelData }
         }
     }
 
     SettingsWindow {}
     Lock {}
+    Welcome {}
+
+    IdleMonitor {
+        enabled: Config.lockOn && Config.opt.idleLock > 0
+        timeout: Math.max(1, Config.opt.idleLock) * 60
+        respectInhibitors: true
+        onIsIdleChanged: if (isIdle) IslandState.lock()
+    }
+
+    Process {
+        running: Config.clipboardOn
+        command: ["wl-paste", "--watch", "cliphist", "store"]
+    }
 
     Binding {
         target: Media
@@ -33,7 +50,7 @@ ShellRoot {
     Binding {
         target: Notifs
         property: "enabled"
-        value: Config.opt.notifications
+        value: Config.notificationsOn
     }
 
     Connections {
@@ -62,6 +79,18 @@ ShellRoot {
         }
         function lock(): void {
             IslandState.lock()
+        }
+        function power(): void {
+            IslandState.toggleOverlay("power")
+        }
+        function clipboard(): void {
+            IslandState.openClipboard()
+        }
+        function screenshot(): void {
+            IslandState.startShot()
+        }
+        function welcome(): void {
+            IslandState.welcomeOpen = true
         }
         function lockpreview(): void {
             IslandState.lockPreview = true

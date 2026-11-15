@@ -20,7 +20,8 @@ PanelWindow {
         notif: [370, 96],
         center: [500, IslandState.centerHeight],
         launcher: [620, 66 + IslandState.launcherRows * 54 + (IslandState.launcherRows > 0 ? 14 : 0)],
-        themes: [960, 420]
+        themes: [960, 420],
+        power: [480, 150]
     })
 
     anchors {
@@ -67,7 +68,7 @@ PanelWindow {
         y: 8
         width: win.sizes[win.mode][0]
         height: win.sizes[win.mode][1]
-        radius: win.mode === "center" || win.mode === "themes" ? 32 : win.mode === "launcher" ? 28 : height / 2
+        radius: win.mode === "center" || win.mode === "themes" || win.mode === "power" ? 32 : win.mode === "launcher" ? 28 : height / 2
         color: Theme.panel
         border.width: 1
         border.color: Theme.alpha(Theme.accent, win.mode === "idle" && !win.hovered ? 0.3 : 0.75)
@@ -95,5 +96,6 @@ PanelWindow {
         View { on: win.mode === "center"; CenterView { anchors.fill: parent; win: win } }
         View { on: win.mode === "launcher"; LauncherView { anchors.fill: parent; active: win.mode === "launcher" } }
         View { on: win.mode === "themes"; ThemesView { anchors.fill: parent; active: win.mode === "themes" } }
+        View { on: win.mode === "power"; PowerView { anchors.fill: parent; active: win.mode === "power" } }
     }
 }
