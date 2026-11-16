@@ -24,7 +24,9 @@ PanelWindow {
         power: [480, 150],
         wifi: [480, IslandState.panelHeight],
         bt: [480, IslandState.panelHeight],
-        btdev: [380, 72]
+        btdev: [380, 72],
+        audio: [480, IslandState.panelHeight],
+        mic: [270, 44]
     })
 
     anchors {
@@ -66,7 +68,7 @@ PanelWindow {
         y: 8
         width: win.sizes[win.mode][0]
         height: win.sizes[win.mode][1]
-        radius: win.mode === "center" || win.mode === "themes" || win.mode === "power" || win.mode === "wifi" || win.mode === "bt" ? 32 : win.mode === "launcher" ? 28 : height / 2
+        radius: win.mode === "center" || win.mode === "themes" || win.mode === "power" || win.mode === "wifi" || win.mode === "bt" || win.mode === "audio" ? 32 : win.mode === "launcher" ? 28 : height / 2
         color: Theme.panel
         border.width: 1
         border.color: Theme.alpha(Theme.accent, win.mode === "idle" && !win.hovered ? 0.3 : 0.75)
@@ -98,5 +100,7 @@ PanelWindow {
         View { on: win.mode === "wifi"; WifiView { anchors.fill: parent; win: win; active: win.mode === "wifi" } }
         View { on: win.mode === "bt"; BtView { anchors.fill: parent; win: win; active: win.mode === "bt" } }
         View { on: win.mode === "btdev"; BtPopView { anchors.fill: parent } }
+        View { on: win.mode === "mic"; MicView { anchors.fill: parent } }
+        View { on: win.mode === "audio"; AudioView { anchors.fill: parent; win: win; active: win.mode === "audio" } }
     }
 }

@@ -121,7 +121,7 @@ Item {
             }
             Slider {
                 anchors.verticalCenter: parent.verticalCenter
-                width: parent.width - 90
+                width: parent.width - 122
                 value: Audio.muted ? 0 : Audio.volume
                 onMoved: v => Audio.setVolume(v)
             }
@@ -131,6 +131,13 @@ Item {
                 horizontalAlignment: Text.AlignRight
                 text: Math.round(Audio.volume * 100) + "%"
                 weight: Font.Medium
+            }
+            Icon {
+                anchors.verticalCenter: parent.verticalCenter
+                text: "󰅂"
+                size: 20
+                color: Theme.subtext
+                onClicked: IslandState.overlay = "audio"
             }
         }
 

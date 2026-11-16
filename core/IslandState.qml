@@ -83,6 +83,13 @@ Singleton {
     }
 
     Connections {
+        target: Audio
+        function onMicBumped() {
+            if (root.temp !== "notif") root.flash("mic", 1400)
+        }
+    }
+
+    Connections {
         target: Brightness
         function onBumped() {
             if (root.temp !== "notif") root.flash("brightness", 1600)

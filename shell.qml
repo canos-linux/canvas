@@ -94,6 +94,12 @@ ShellRoot {
         function bluetooth(): void {
             IslandState.toggleOverlay("bt")
         }
+        function audio(): void {
+            IslandState.toggleOverlay("audio")
+        }
+        function micmute(): void {
+            Audio.toggleMic()
+        }
         function clipboard(): void {
             IslandState.openClipboard()
         }
