@@ -1,6 +1,8 @@
 import QtQuick
 import "../core"
 import "../ui"
+import "../services"
+import Quickshell.Widgets
 
 Item {
     Column {
@@ -12,11 +14,12 @@ Item {
 
         Row {
             spacing: 7
-            Icon {
-                text: "󰂚"
-                size: 14
-                color: Theme.accent
-                hoverable: false
+            Item {
+                width: 14
+                height: 14
+                readonly property string src: IslandState.notifEntry ? Notifs.iconSource(IslandState.notifEntry.icon) : ""
+                IconImage { anchors.fill: parent; visible: parent.src !== ""; source: parent.src }
+                Icon { anchors.centerIn: parent; visible: parent.src === ""; text: "󰂚"; size: 14; color: Theme.accent; hoverable: false }
             }
             Txt {
                 text: IslandState.notifApp + "  ·  " + Lang.t.now

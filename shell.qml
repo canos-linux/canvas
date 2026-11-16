@@ -60,8 +60,8 @@ ShellRoot {
 
     Connections {
         target: Notifs
-        function onReceived(app, title, body) {
-            IslandState.notify(app, title, body)
+        function onPosted(e) {
+            IslandState.show(e)
         }
     }
 

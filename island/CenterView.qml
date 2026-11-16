@@ -11,7 +11,7 @@ Item {
     id: center
     property var win
     // fewer visible notifications on small screens so the bottom row always fits
-    readonly property int notifRows: win && win.screen ? Math.max(1, Math.min(3, Math.floor((Math.min(900, win.screen.height - 60) - 608) / 62))) : 3
+    readonly property int notifRows: win && win.screen ? Math.max(1, Math.min(3, Math.floor((Math.min(900, win.screen.height - 60) - 640) / 74))) : 3
 
     SystemClock {
         id: clock
@@ -286,52 +286,7 @@ Item {
                 }
             }
 
-            ListView {
-                width: parent.width
-                height: Math.min(Notifs.history.length, center.notifRows) * 62 - 8
-                spacing: 8
-                clip: true
-                boundsBehavior: Flickable.StopAtBounds
-                model: Notifs.history.slice(0, 30)
-                delegate: Rectangle {
-                    required property var modelData
-                    width: ListView.view.width
-                    height: 54
-                    radius: 16
-                    color: Theme.card
-
-                    Row {
-                        anchors.left: parent.left
-                        anchors.leftMargin: 14
-                        anchors.verticalCenter: parent.verticalCenter
-                        spacing: 12
-                        Icon {
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: "󰂚"
-                            size: 18
-                            color: Theme.accent
-                            hoverable: false
-                        }
-                        Column {
-                            anchors.verticalCenter: parent.verticalCenter
-                            Txt {
-                                width: 380
-                                text: modelData.title
-                                size: 13
-                                weight: Font.DemiBold
-                                elide: Text.ElideRight
-                            }
-                            Txt {
-                                width: 380
-                                text: modelData.app + " · " + modelData.time + (modelData.body ? "  —  " + modelData.body : "")
-                                size: 11
-                                color: Theme.subtext
-                                elide: Text.ElideRight
-                            }
-                        }
-                    }
-                }
-            }
+            NotifList { maxRows: center.notifRows }
         }
 
         Item {

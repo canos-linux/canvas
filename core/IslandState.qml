@@ -9,6 +9,7 @@ Singleton {
     property string notifApp: ""
     property string notifTitle: ""
     property string notifBody: ""
+    property var notifEntry: null
     property string overlay: ""
     property string expandedScreen: ""
     property bool settingsOpen: false
@@ -31,11 +32,15 @@ Singleton {
     }
 
     function notify(app, title, body) {
-        Notifs.add(app, title, body)
-        if (Config.opt.dnd) return
-        notifApp = app
-        notifTitle = title
-        notifBody = body
+        show(Notifs.add(app, title, body))
+    }
+
+    function show(e) {
+        if (Config.opt.dnd && !e.urgent) return
+        notifEntry = e
+        notifApp = e.app
+        notifTitle = e.title
+        notifBody = e.body
         flash("notif", Config.opt.notifDuration * 1000)
     }
 
@@ -86,6 +91,14 @@ Singleton {
         target: Audio
         function onMicBumped() {
             if (root.temp !== "notif") root.flash("mic", 1400)
+        }
+    }
+
+    Connections {
+        target: Auth
+        function onActiveChanged() {
+            if (Auth.active) root.overlay = "polkit"
+            else if (root.overlay === "polkit") root.overlay = ""
         }
     }
 
