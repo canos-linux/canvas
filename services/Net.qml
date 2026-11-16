@@ -11,6 +11,7 @@ Singleton {
     property bool wired: false
     property bool enabled: true
     property bool hotspot: false
+    property bool hasDevice: true
     property bool connected: wired || ssid !== ""
     property string icon: wired ? "󰈀" : !enabled ? "󰤭" : hotspot ? "󰀂" : ssid === "" ? "󰤮" : strength > 75 ? "󰤨" : strength > 50 ? "󰤥" : strength > 25 ? "󰤢" : "󰤟"
     property string label: wired ? "Ethernet" : !enabled ? Lang.t.off : hotspot ? Lang.t.wifiHotspot : ssid === "" ? Lang.t.offline : ssid
@@ -126,7 +127,7 @@ Singleton {
         scan(false)
     }
 
-    readonly property string scanScript: "export LC_ALL=C; if [ \"$1\" = yes ]; then nmcli dev wifi rescan 2>/dev/null; sleep 2.5; fi; echo \"@RADIO $(nmcli radio wifi)\"; nmcli -t -f NAME,TYPE connection show | grep ':802-11-wireless$' | sed 's/^/@SAVED /'; nmcli -t -f NAME connection show --active | sed 's/^/@ACTIVE /'; nmcli -t -f IN-USE,SIGNAL,SECURITY,FREQ,SSID dev wifi list --rescan no | sed 's/^/@NET /'"
+    readonly property string scanScript: "export LC_ALL=C; if [ \"$1\" = yes ]; then nmcli dev wifi rescan 2>/dev/null; sleep 2.5; fi; echo \"@RADIO $(nmcli radio wifi)\"; nmcli -t -f TYPE dev | grep -qx wifi && echo @DEV; nmcli -t -f NAME,TYPE connection show | grep ':802-11-wireless$' | sed 's/^/@SAVED /'; nmcli -t -f NAME connection show --active | sed 's/^/@ACTIVE /'; nmcli -t -f IN-USE,SIGNAL,SECURITY,FREQ,SSID dev wifi list --rescan no | sed 's/^/@NET /'"
 
     readonly property string qrScript: "export LC_ALL=C; p=$(nmcli -s -g 802-11-wireless-security.psk connection show id \"$1\" 2>/dev/null); s=$(nmcli -g 802-11-wireless.ssid connection show id \"$1\" 2>/dev/null); [ -n \"$s\" ] || s=\"$1\"; esc() { printf %s \"$1\" | sed 's/[\\\;,:\"]/\\\\&/g'; }; t=WPA; [ -n \"$p\" ] || t=nopass; rm -f \"$2\"/canvas-wifi-qr-*.png; f=\"$2/canvas-wifi-qr-$$.png\"; command -v qrencode >/dev/null && qrencode -o \"$f\" -s 10 -m 1 \"WIFI:T:$t;S:$(esc \"$s\");P:$(esc \"$p\");;\" && echo \"FILE $f\"; echo \"PW $p\""
 
@@ -138,8 +139,10 @@ Singleton {
                 const sav = []
                 const act = []
                 let radio = true
+                let dev = false
                 for (const l of text.split("\n")) {
-                    if (l.startsWith("@RADIO ")) radio = l.slice(7).trim() === "enabled"
+                    if (l === "@DEV") dev = true
+                    else if (l.startsWith("@RADIO ")) radio = l.slice(7).trim() === "enabled"
                     else if (l.startsWith("@SAVED ")) sav.push(root.fields(l.slice(7))[0])
                     else if (l.startsWith("@ACTIVE ")) act.push(root.fields(l.slice(8))[0])
                     else if (l.startsWith("@NET ")) {
@@ -155,6 +158,7 @@ Singleton {
                 for (const n of list) n.saved = sav.indexOf(n.ssid) !== -1
                 list.sort((a, b) => (b.active - a.active) || (b.saved - a.saved) || (b.level - a.level))
                 root.enabled = radio
+                root.hasDevice = dev
                 root.saved = sav
                 root.hotspot = act.indexOf("Hotspot") !== -1
                 root.networks = radio ? list : []

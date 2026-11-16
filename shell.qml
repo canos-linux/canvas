@@ -88,6 +88,12 @@ ShellRoot {
         function power(): void {
             IslandState.toggleOverlay("power")
         }
+        function wifi(): void {
+            IslandState.toggleOverlay("wifi")
+        }
+        function bluetooth(): void {
+            IslandState.toggleOverlay("bt")
+        }
         function clipboard(): void {
             IslandState.openClipboard()
         }

@@ -56,12 +56,7 @@ PanelWindow {
         opacity: on ? 1 : 0
         scale: on ? 1 : 0.9
         visible: opacity > 0
-        Behavior on opacity {
-            SequentialAnimation {
-                PauseAnimation { duration: view.on ? Theme.dur(140) : 0 }
-                NumberAnimation { duration: Theme.dur(220) }
-            }
-        }
+        Behavior on opacity { NumberAnimation { duration: Theme.dur(view.on ? 320 : 150); easing.type: Easing.InOutQuad } }
         Behavior on scale { NumberAnimation { duration: Theme.dur(420); easing.type: Easing.OutBack } }
     }
 

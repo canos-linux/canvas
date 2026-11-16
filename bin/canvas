@@ -19,7 +19,7 @@ case "$1" in
     log)
         cat /tmp/canvas.log
         ;;
-    launcher|themes|center|settings|lock|lockpreview|power|clipboard|screenshot|welcome)
+    launcher|themes|center|settings|lock|lockpreview|power|wifi|bluetooth|clipboard|screenshot|welcome)
         qs -p "$dir/shell.qml" ipc call island "$1"
         ;;
     theme)
@@ -30,6 +30,6 @@ case "$1" in
         qs -p "$dir/shell.qml" ipc call island notify "${2:-Canvas}" "${3:-Test}" "${4:-}"
         ;;
     *)
-        echo "canvas start|stop|restart|log|launcher|themes|center|settings|lock|lockpreview|power|clipboard|screenshot|welcome|theme <name>|notify <app> <title> <text>"
+        echo "canvas start|stop|restart|log|launcher|themes|center|settings|lock|lockpreview|power|wifi|bluetooth|clipboard|screenshot|welcome|theme <name>|notify <app> <title> <text>"
         ;;
 esac

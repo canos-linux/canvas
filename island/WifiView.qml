@@ -223,7 +223,7 @@ FocusScope {
                 hoverable: false
                 color: Theme.subtext
                 SequentialAnimation on opacity {
-                    running: Net.enabled && Net.scanning
+                    running: Net.hasDevice && Net.enabled && Net.scanning
                     loops: Animation.Infinite
                     onRunningChanged: if (!running) emptyIcon.opacity = 1
                     NumberAnimation { to: 0.3; duration: 600 }
@@ -232,7 +232,7 @@ FocusScope {
             }
             Txt {
                 anchors.horizontalCenter: parent.horizontalCenter
-                text: !Net.enabled ? Lang.t.wifiOffHint : Net.scanning ? Lang.t.wifiScanning : Lang.t.wifiNone
+                text: !Net.hasDevice ? Lang.t.wifiNoDevice : !Net.enabled ? Lang.t.wifiOffHint : Net.scanning ? Lang.t.wifiScanning : Lang.t.wifiNone
                 color: Theme.subtext
             }
         }
@@ -443,7 +443,7 @@ FocusScope {
 
         // footer
         Row {
-            visible: !wv.qr
+            visible: !wv.qr && Net.hasDevice
             spacing: 8
             Pill {
                 visible: Net.enabled
