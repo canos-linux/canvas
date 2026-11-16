@@ -89,15 +89,15 @@ Item {
                 title: Lang.t.wifi
                 sub: Net.label
                 active: Net.connected
-                onClicked: Net.openSettings()
+                onClicked: IslandState.overlay = "wifi"
             }
             Tile {
                 width: (parent.width - 20) / 3
                 icon: Bt.icon
                 title: "Bluetooth"
-                sub: !Bt.powered ? Lang.t.off : Bt.device !== "" ? Bt.device : Lang.t.on
+                sub: Bt.label
                 active: Bt.powered
-                onClicked: Bt.toggle()
+                onClicked: IslandState.overlay = "bt"
             }
             Tile {
                 width: (parent.width - 20) / 3
@@ -247,10 +247,16 @@ Item {
                 }
             }
 
-            Repeater {
-                model: Notifs.history.slice(0, 3)
-                Rectangle {
-                    width: parent.width
+            ListView {
+                width: parent.width
+                height: Math.min(Notifs.history.length, 3) * 62 - 8
+                spacing: 8
+                clip: true
+                boundsBehavior: Flickable.StopAtBounds
+                model: Notifs.history.slice(0, 30)
+                delegate: Rectangle {
+                    required property var modelData
+                    width: ListView.view.width
                     height: 54
                     radius: 16
                     color: Theme.card

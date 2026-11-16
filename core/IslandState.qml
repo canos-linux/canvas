@@ -19,6 +19,10 @@ Singleton {
     property bool lockPreview: false
     property int launcherRows: 0
     property real centerHeight: 400
+    property real panelHeight: 300
+    property string btPopName: ""
+    property string btPopIcon: ""
+    property real btPopBattery: -1
 
     function flash(kind, ms) {
         temp = kind
@@ -82,6 +86,16 @@ Singleton {
         target: Brightness
         function onBumped() {
             if (root.temp !== "notif") root.flash("brightness", 1600)
+        }
+    }
+
+    Connections {
+        target: Bt
+        function onDeviceConnected(d) {
+            root.btPopName = d.name
+            root.btPopIcon = Bt.glyph(d)
+            root.btPopBattery = d.batteryAvailable ? d.battery : -1
+            if (root.temp !== "notif") root.flash("btdev", 3200)
         }
     }
 
