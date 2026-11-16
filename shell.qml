@@ -29,11 +29,16 @@ ShellRoot {
     Lock {}
     Welcome {}
 
-    IdleMonitor {
-        enabled: Config.lockOn && Config.opt.idleLock > 0
-        timeout: Math.max(1, Config.opt.idleLock) * 60
-        respectInhibitors: true
-        onIsIdleChanged: if (isIdle) IslandState.lock()
+    // Recreated when the setting changes: IdleMonitor does not pick up later
+    // changes of enabled/timeout reliably.
+    Instantiator {
+        model: Config.lockOn && Config.opt.idleLock > 0 ? [Config.opt.idleLock] : []
+        delegate: IdleMonitor {
+            required property int modelData
+            timeout: modelData * 60
+            respectInhibitors: true
+            onIsIdleChanged: if (isIdle) IslandState.lock()
+        }
     }
 
     Process {
