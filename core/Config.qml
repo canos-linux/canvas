@@ -14,13 +14,31 @@ Singleton {
     readonly property bool ownColorsOn: !Edition.priv || adapter.ownColors
     readonly property bool clipboardOn: !Edition.priv && adapter.clipboard
 
+    function systemLang() {
+        let l = Quickshell.env("LC_ALL") || Quickshell.env("LC_MESSAGES") || Quickshell.env("LANG") || ""
+        if (!l) {
+            const m = (localeConf.text() || "").match(/^LANG="?([^"\s]+)/m)
+            if (m) l = m[1]
+        }
+        return l.startsWith("de") ? "de" : "en"
+    }
+
+    FileView {
+        id: localeConf
+        path: "/etc/locale.conf"
+        blockLoading: true
+    }
+
     FileView {
         path: root.path
         watchChanges: true
         onFileChanged: reload()
         onAdapterUpdated: writeAdapter()
         onLoadFailed: error => {
-            if (error === FileViewError.FileNotFound) writeAdapter()
+            if (error === FileViewError.FileNotFound) {
+                adapter.language = root.systemLang()
+                writeAdapter()
+            }
         }
 
         JsonAdapter {
