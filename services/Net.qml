@@ -18,15 +18,18 @@ Singleton {
 
     Process {
         id: query
-        command: ["sh", "-c", "nmcli -t -f TYPE,STATE dev | grep -q '^ethernet:connected' && echo ETH; nmcli -t -f ACTIVE,SIGNAL,SSID dev wifi list --rescan no | grep '^yes:'"]
+        command: ["sh", "-c", "nmcli -t -f TYPE,STATE dev | grep ^ethernet:connected >/dev/null && echo ETH; nmcli -t -f DEVICE,TYPE,STATE,CONNECTION dev | grep :wifi:connected:; nmcli -t -f ACTIVE,SIGNAL,SSID dev wifi list --rescan no | grep ^yes:; true"]
         stdout: StdioCollector {
             onStreamFinished: {
-                root.wired = text.indexOf("ETH") !== -1
-                const line = text.split("\n").find(l => l.startsWith("yes:"))
-                if (line) {
-                    const parts = line.split(":")
-                    root.strength = parseInt(parts[1])
-                    root.ssid = parts.slice(2).join(":")
+                const lines = text.split("\n")
+                root.wired = lines.indexOf("ETH") !== -1
+                const dev = lines.find(l => l.indexOf(":wifi:connected:") !== -1)
+                const act = lines.find(l => l.startsWith("yes:"))
+                if (dev) {
+                    // DEVICE:TYPE:STATE:CONNECTION – name comes from the device line, signal from the wifi list
+                    const name = dev.split(":").slice(3).join(":")
+                    root.ssid = name !== "" ? name : (act ? act.split(":").slice(2).join(":") : "")
+                    root.strength = act ? parseInt(act.split(":")[1]) || 0 : 0
                 } else {
                     root.strength = 0
                     root.ssid = ""
