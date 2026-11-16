@@ -53,6 +53,7 @@ Item {
                 spacing: 14
 
                 Row {
+                    visible: Power.present
                     anchors.verticalCenter: parent.verticalCenter
                     spacing: 7
                     BatteryIcon { anchors.verticalCenter: parent.verticalCenter }

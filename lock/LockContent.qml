@@ -153,6 +153,7 @@ Item {
         opacity: 0.85
 
         Row {
+            visible: Power.present
             spacing: 8
             BatteryIcon { anchors.verticalCenter: parent.verticalCenter }
             Txt { anchors.verticalCenter: parent.verticalCenter; text: Power.percent + "%"; size: 14 }
