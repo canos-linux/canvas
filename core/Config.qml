@@ -13,6 +13,7 @@ Singleton {
     readonly property bool lockOn: !Edition.priv || adapter.lockscreen
     readonly property bool ownColorsOn: !Edition.priv || adapter.ownColors
     readonly property bool clipboardOn: !Edition.priv && adapter.clipboard
+    readonly property string timeFmt: adapter.clock24 ? "HH:mm" : "h:mm AP"
 
     function systemLang() {
         let l = Quickshell.env("LC_ALL") || Quickshell.env("LC_MESSAGES") || Quickshell.env("LANG") || ""
@@ -66,6 +67,13 @@ Singleton {
             property int nightTemp: 4500
             property bool batteryWarn: true
             property bool lockOnSleep: true
+            property bool clock24: true
+            property bool tapToClick: true
+            property bool naturalScroll: true
+            property bool typingBlock: true
+            property real touchpadSpeed: 0
+            property real mouseSpeed: 0
+            property string kbLayouts: ""
         }
     }
 }

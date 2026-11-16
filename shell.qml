@@ -80,7 +80,12 @@ ShellRoot {
             IslandState.expandedScreen = IslandState.expandedScreen !== "" ? "" : (Hypr.focusedMonitor || Quickshell.screens[0].name)
         }
         function settings(): void {
+            IslandState.settingsPage = ""
             IslandState.settingsOpen = !IslandState.settingsOpen
+        }
+        function settingspage(page: string): void {
+            IslandState.settingsPage = page
+            IslandState.settingsOpen = true
         }
         function lock(): void {
             IslandState.lock()

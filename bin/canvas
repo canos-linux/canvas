@@ -7,6 +7,7 @@ fi
 case "$1" in
     start)
         pgrep -f "qs -p $dir/shell.qml" >/dev/null || setsid -f qs -p "$dir/shell.qml" >/tmp/canvas.log 2>&1
+        command -v udiskie >/dev/null && ! pgrep -x udiskie >/dev/null && setsid -f udiskie -a -n -T >/dev/null 2>&1
         ;;
     stop)
         qs kill -p "$dir/shell.qml" >/dev/null 2>&1
@@ -19,7 +20,10 @@ case "$1" in
     log)
         cat /tmp/canvas.log
         ;;
-    launcher|themes|center|settings|lock|lockpreview|power|wifi|bluetooth|audio|micmute|nightlight|profile|nightlight|profile|charge|clipboard|screenshot|welcome)
+    settings)
+        if [ -n "$2" ]; then qs -p "$dir/shell.qml" ipc call island settingspage "$2"; else qs -p "$dir/shell.qml" ipc call island settings; fi
+        ;;
+    launcher|themes|center|lock|lockpreview|power|wifi|bluetooth|audio|micmute|nightlight|profile|nightlight|profile|charge|clipboard|screenshot|welcome)
         qs -p "$dir/shell.qml" ipc call island "$1"
         ;;
     theme)
@@ -30,6 +34,6 @@ case "$1" in
         qs -p "$dir/shell.qml" ipc call island notify "${2:-Canvas}" "${3:-Test}" "${4:-}"
         ;;
     *)
-        echo "canvas start|stop|restart|log|launcher|themes|center|settings|lock|lockpreview|power|wifi|bluetooth|clipboard|screenshot|welcome|theme <name>|notify <app> <title> <text>"
+        echo "canvas start|stop|restart|log|launcher|themes|center|settings [page]|lock|lockpreview|power|wifi|bluetooth|clipboard|screenshot|welcome|theme <name>|notify <app> <title> <text>"
         ;;
 esac

@@ -38,7 +38,7 @@ Item {
 
             Column {
                 Txt {
-                    text: Qt.formatTime(clock.date, "HH:mm")
+                    text: Qt.formatTime(clock.date, Config.timeFmt)
                     size: 32
                     weight: Font.Bold
                 }

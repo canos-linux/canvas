@@ -15,15 +15,28 @@ LazyLoader {
         color: Theme.base
         onVisibleChanged: if (!visible) IslandState.settingsOpen = false
 
-        property int page: 0
+        property string page: IslandState.settingsPage || "look"
         property var pages: [
-            { icon: "󰏘", name: Lang.t.pageLook },
-            { icon: "󱂬", name: Lang.t.pageIsland },
-            { icon: "󰕮", name: Lang.t.pageCenter },
-            { icon: "󰒓", name: Lang.t.pageParts, priv: true },
-            { icon: "󰍹", name: Lang.t.pageSystem },
-            { icon: "󰋼", name: Lang.t.pageAbout }
+            { key: "look", icon: "󰏘", name: Lang.t.pageLook },
+            { key: "island", icon: "󱂬", name: Lang.t.pageIsland },
+            { key: "center", icon: "󰕮", name: Lang.t.pageCenter },
+            { key: "parts", icon: "󰒓", name: Lang.t.pageParts, priv: true },
+            { key: "display", icon: "󰍹", name: Lang.t.pageDisplay },
+            { key: "input", icon: "󰌌", name: Lang.t.pageInput },
+            { key: "system", icon: "󰒔", name: Lang.t.pageSystem },
+            { key: "apps", icon: "󰀻", name: Lang.t.pageApps },
+            { key: "account", icon: "󰀄", name: Lang.t.pageAccount },
+            { key: "time", icon: "󰥔", name: Lang.t.pageTime },
+            { key: "about", icon: "󰋼", name: Lang.t.pageAbout }
         ]
+        readonly property var current: pages.find(p => p.key === page) || pages[0]
+
+        Connections {
+            target: IslandState
+            function onSettingsPageChanged() {
+                if (IslandState.settingsPage) win.page = IslandState.settingsPage
+            }
+        }
 
         Rectangle {
             id: sidebar
@@ -36,11 +49,11 @@ LazyLoader {
             Column {
                 anchors.fill: parent
                 anchors.margins: 18
-                spacing: 6
+                spacing: 2
 
                 Row {
                     spacing: 10
-                    bottomPadding: 18
+                    bottomPadding: 14
                     Rectangle {
                         width: 36
                         height: 36
@@ -65,10 +78,10 @@ LazyLoader {
                     model: win.pages
                     Rectangle {
                         width: parent.width
-                        height: 44
+                        height: visible ? 40 : 0
                         visible: !modelData.priv || Edition.priv
                         radius: 14
-                        color: win.page === index ? Theme.alpha(Theme.accent, 0.2) : navArea.containsMouse ? Theme.surfaceHigh : "transparent"
+                        color: win.page === modelData.key ? Theme.alpha(Theme.accent, 0.2) : navArea.containsMouse ? Theme.surfaceHigh : "transparent"
                         Behavior on color { ColorAnimation { duration: Theme.dur(150) } }
                         Row {
                             anchors.left: parent.left
@@ -80,19 +93,19 @@ LazyLoader {
                                 text: modelData.icon
                                 size: 18
                                 hoverable: false
-                                color: win.page === index ? Theme.accent : Theme.text
+                                color: win.page === modelData.key ? Theme.accent : Theme.text
                             }
                             Txt {
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: modelData.name
-                                weight: win.page === index ? Font.DemiBold : Font.Normal
+                                weight: win.page === modelData.key ? Font.DemiBold : Font.Normal
                             }
                         }
                         MouseArea {
                             id: navArea
                             anchors.fill: parent
                             hoverEnabled: true
-                            onClicked: win.page = index
+                            onClicked: win.page = modelData.key
                         }
                     }
                 }
@@ -115,7 +128,7 @@ LazyLoader {
                 spacing: 0
 
                 Txt {
-                    text: win.pages[win.page].name
+                    text: win.current.name
                     size: 26
                     weight: Font.Bold
                     bottomPadding: 14
@@ -123,7 +136,7 @@ LazyLoader {
 
                 Column {
                     width: parent.width
-                    visible: win.page === 0
+                    visible: win.page === "look"
                     SettingRow {
                         title: Lang.t.language
                         sub: Lang.t.languageSub
@@ -163,7 +176,7 @@ LazyLoader {
 
                 Column {
                     width: parent.width
-                    visible: win.page === 1
+                    visible: win.page === "island"
                     SettingRow {
                         title: Lang.t.hoverDate
                         sub: Lang.t.hoverDateSub
@@ -198,7 +211,7 @@ LazyLoader {
 
                 Column {
                     width: parent.width
-                    visible: win.page === 2
+                    visible: win.page === "center"
                     SettingRow {
                         title: Lang.t.visualizer
                         sub: Lang.t.visualizerSub
@@ -213,7 +226,7 @@ LazyLoader {
 
                 Column {
                     width: parent.width
-                    visible: win.page === 3
+                    visible: win.page === "parts"
                     Txt {
                         width: parent.width
                         text: Lang.t.partsInfo
@@ -268,7 +281,7 @@ LazyLoader {
 
                 Column {
                     width: parent.width
-                    visible: win.page === 4
+                    visible: win.page === "system"
                     SettingRow {
                         title: Lang.t.idleLock
                         sub: Lang.t.idleLockSub
@@ -363,14 +376,12 @@ LazyLoader {
                     }
                 }
 
-                Column {
-                    width: parent.width
-                    visible: win.page === 5
-                    spacing: 8
-                    Txt { text: Lang.t.aboutTitle; size: 16; weight: Font.DemiBold }
-                    Txt { text: Lang.t.aboutBuilt; size: 13; color: Theme.subtext }
-                    Txt { text: Lang.t.aboutShortcuts; size: 13; color: Theme.subtext }
-                }
+                DisplayPage { visible: win.page === "display" }
+                InputPage { visible: win.page === "input" }
+                AppsPage { visible: win.page === "apps" }
+                AccountPage { visible: win.page === "account" }
+                TimePage { visible: win.page === "time" }
+                AboutPage { visible: win.page === "about" }
             }
         }
     }

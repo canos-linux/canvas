@@ -52,7 +52,7 @@ Item {
 
         Txt {
             anchors.horizontalCenter: parent.horizontalCenter
-            text: Qt.formatTime(clock.date, "HH:mm")
+            text: Qt.formatTime(clock.date, Config.timeFmt)
             size: 128
             weight: Font.Bold
         }

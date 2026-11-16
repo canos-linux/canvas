@@ -77,7 +77,7 @@ Singleton {
 
     function ago(t) {
         const m = Math.floor((root.now - t) / 60000)
-        return m < 1 ? Lang.t.now : m < 60 ? Lang.t.minAgo.replace("%1", m) : Qt.formatTime(new Date(t), "HH:mm")
+        return m < 1 ? Lang.t.now : m < 60 ? Lang.t.minAgo.replace("%1", m) : Qt.formatTime(new Date(t), Config.timeFmt)
     }
 
     function iconSource(icon) {

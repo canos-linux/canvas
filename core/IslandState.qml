@@ -13,6 +13,7 @@ Singleton {
     property string overlay: ""
     property string expandedScreen: ""
     property bool settingsOpen: false
+    property string settingsPage: ""
     property bool welcomeOpen: false
     property bool shooting: false
     property string launcherPrefix: ""
