@@ -67,6 +67,12 @@ Column {
             Txt { text: page.info.os || "CanOS"; size: 26; weight: Font.Bold }
             Txt { text: "Canvas " + (page.info.canvas || "") + "  ·  " + (page.info.de || "Hyprland"); size: 13; color: Theme.subtext }
             Txt { text: Lang.t.slogan; size: 13; color: Theme.accent; weight: Font.Medium }
+            Row {
+                spacing: 8
+                topPadding: 8
+                PillButton { text: Lang.t.website; onClicked: Quickshell.execDetached(["xdg-open", "https://tschaki11.github.io/canos/"]) }
+                PillButton { text: Lang.t.reportBug; onClicked: Quickshell.execDetached(["xdg-open", "https://github.com/tschaki11/canos-iso/issues"]) }
+            }
         }
     }
 

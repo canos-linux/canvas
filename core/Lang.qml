@@ -224,7 +224,7 @@ Singleton {
         mouseSpeedSub: "For all mice",
         kbSection: "Keyboard",
         kbLayouts: "Keyboard layouts",
-        kbLayoutsSub: "Alt + Shift switches between them",
+        kbLayoutsSub: "Switch them with the Keyboard tile in the Control Center",
         kbAdd: "+ Add layout",
         kbAddHint: "Choose …",
         accountName: "Name",
@@ -269,6 +269,8 @@ Singleton {
         updatesNone: "Everything is up to date",
         updatesAvail: "%1 updates available",
         updatesCheck: "Check",
+        website: "Website",
+        reportBug: "Report a bug",
         updatesRun: "Update"
     })
 
@@ -484,7 +486,7 @@ Singleton {
         mouseSpeedSub: "Für alle Mäuse",
         kbSection: "Tastatur",
         kbLayouts: "Tastaturlayouts",
-        kbLayoutsSub: "Alt + Umschalt wechselt zwischen ihnen",
+        kbLayoutsSub: "Wechseln mit der Tastatur-Kachel im Control-Center",
         kbAdd: "+ Layout hinzufügen",
         kbAddHint: "Auswählen …",
         accountName: "Name",
@@ -529,6 +531,8 @@ Singleton {
         updatesNone: "Alles ist aktuell",
         updatesAvail: "%1 Updates verfügbar",
         updatesCheck: "Prüfen",
+        website: "Website",
+        reportBug: "Fehler melden",
         updatesRun: "Aktualisieren"
     })
 }

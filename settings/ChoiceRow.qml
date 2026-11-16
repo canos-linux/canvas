@@ -23,6 +23,30 @@ Column {
     }
     width: parent ? parent.width : 400
 
+    onOpenChanged: if (open) reveal.restart()
+
+    Timer {
+        id: reveal
+        interval: Theme.dur(280) + 20
+        onTriggered: {
+            let f = row.parent
+            while (f && f.contentY === undefined) f = f.parent
+            if (!f) return
+            const y = row.mapToItem(f.contentItem, 0, 0).y + row.height + 12 - f.height
+            if (y > f.contentY) scroll.to = Math.min(y, Math.max(0, f.contentHeight - f.height))
+            else return
+            scroll.target = f
+            scroll.restart()
+        }
+    }
+
+    NumberAnimation {
+        id: scroll
+        property: "contentY"
+        duration: Theme.dur(300)
+        easing.type: Easing.OutCubic
+    }
+
     SettingRow {
         title: row.title
         sub: row.sub

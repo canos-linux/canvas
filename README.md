@@ -40,4 +40,4 @@ Needs Hyprland ≥ 0.57 (Lua config), Quickshell, NetworkManager, BlueZ, PipeWir
 
 ## License
 
-GPL-3.0 – see [LICENSE](LICENSE). Made by Serkan Can Polat.
+GPL-3.0 – see [LICENSE](LICENSE). Made by the creator of CanOS.
