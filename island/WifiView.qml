@@ -183,7 +183,10 @@ FocusScope {
                 Txt {
                     anchors.centerIn: parent
                     visible: !Net.qrLoading && Net.qrPath === ""
-                    text: "qrencode?"
+                    text: Lang.t.wifiNoQr
+                    width: 180
+                    wrapMode: Text.WordWrap
+                    horizontalAlignment: Text.AlignHCenter
                     color: "#555"
                 }
             }
