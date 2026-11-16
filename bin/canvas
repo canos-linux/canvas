@@ -19,7 +19,7 @@ case "$1" in
     log)
         cat /tmp/canvas.log
         ;;
-    launcher|themes|center|settings|lock|lockpreview|power|wifi|bluetooth|audio|micmute|clipboard|screenshot|welcome)
+    launcher|themes|center|settings|lock|lockpreview|power|wifi|bluetooth|audio|micmute|nightlight|profile|nightlight|profile|charge|clipboard|screenshot|welcome)
         qs -p "$dir/shell.qml" ipc call island "$1"
         ;;
     theme)

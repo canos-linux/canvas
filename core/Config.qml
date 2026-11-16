@@ -60,6 +60,12 @@ Singleton {
             property bool notifications: false
             property bool lockscreen: false
             property bool ownColors: false
+            property string nightMode: "off"
+            property string nightFrom: "20:00"
+            property string nightTo: "07:00"
+            property int nightTemp: 4500
+            property bool batteryWarn: true
+            property bool lockOnSleep: true
         }
     }
 }

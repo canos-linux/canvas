@@ -281,6 +281,58 @@ LazyLoader {
                         }
                     }
                     SettingRow {
+                        title: Lang.t.nightLight
+                        sub: Lang.t.nightLightSub
+                        Segmented {
+                            options: [Lang.t.off, Lang.t.on, Lang.t.nightAuto]
+                            values: ["off", "on", "auto"]
+                            value: Config.opt.nightMode
+                            onPicked: v => Config.opt.nightMode = v
+                        }
+                    }
+                    SettingRow {
+                        title: Lang.t.nightStrength
+                        opacity: Config.opt.nightMode === "off" ? 0.4 : 1
+                        Segmented {
+                            options: [Lang.t.nightStrong, Lang.t.nightMedium, Lang.t.nightSoft]
+                            values: [3500, 4500, 5500]
+                            value: Config.opt.nightTemp
+                            onPicked: v => Config.opt.nightTemp = v
+                        }
+                    }
+                    SettingRow {
+                        title: Lang.t.nightFrom
+                        opacity: Config.opt.nightMode === "auto" ? 1 : 0.4
+                        Segmented {
+                            options: ["19:00", "20:00", "21:00", "22:00"]
+                            values: ["19:00", "20:00", "21:00", "22:00"]
+                            value: Config.opt.nightFrom
+                            onPicked: v => Config.opt.nightFrom = v
+                        }
+                    }
+                    SettingRow {
+                        title: Lang.t.nightTo
+                        opacity: Config.opt.nightMode === "auto" ? 1 : 0.4
+                        Segmented {
+                            options: ["06:00", "07:00", "08:00"]
+                            values: ["06:00", "07:00", "08:00"]
+                            value: Config.opt.nightTo
+                            onPicked: v => Config.opt.nightTo = v
+                        }
+                    }
+                    SettingRow {
+                        visible: Power.present
+                        title: Lang.t.batteryWarn
+                        sub: Lang.t.batteryWarnSub
+                        Toggle { checked: Config.opt.batteryWarn; onToggled: v => Config.opt.batteryWarn = v }
+                    }
+                    SettingRow {
+                        title: Lang.t.lockOnSleep
+                        sub: Lang.t.lockOnSleepSub
+                        opacity: Config.lockOn ? 1 : 0.4
+                        Toggle { checked: Config.opt.lockOnSleep; onToggled: v => Config.opt.lockOnSleep = v }
+                    }
+                    SettingRow {
                         visible: !Edition.priv
                         title: Lang.t.clipboard
                         sub: Lang.t.clipboardSub

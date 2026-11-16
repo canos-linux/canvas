@@ -100,6 +100,15 @@ ShellRoot {
         function micmute(): void {
             Audio.toggleMic()
         }
+        function nightlight(): void {
+            Night.cycle()
+        }
+        function profile(): void {
+            Power.cycleProfile()
+        }
+        function charge(): void {
+            IslandState.flash("charge", 2800)
+        }
         function clipboard(): void {
             IslandState.openClipboard()
         }

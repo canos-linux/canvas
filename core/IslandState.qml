@@ -90,6 +90,22 @@ Singleton {
     }
 
     Connections {
+        target: Power
+        function onPlugged() {
+            if (root.temp !== "notif") root.flash("charge", 2800)
+        }
+        function onWarn(level) {
+            if (Config.opt.batteryWarn) root.notify("Canvas", Lang.t.batteryLow.replace("%1", level), level <= 5 ? Lang.t.batteryCritical : Lang.t.batteryPlug)
+        }
+        function onFull() {
+            if (Config.opt.batteryWarn) root.notify("Canvas", Lang.t.batteryFull, "")
+        }
+        function onSleeping() {
+            if (Config.opt.lockOnSleep) root.lock()
+        }
+    }
+
+    Connections {
         target: Brightness
         function onBumped() {
             if (root.temp !== "notif") root.flash("brightness", 1600)

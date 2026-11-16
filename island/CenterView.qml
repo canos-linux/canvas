@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Widgets
 import Quickshell.Services.SystemTray
+import Quickshell.Services.UPower
 import "../core"
 import "../services"
 import "../ui"
@@ -9,6 +10,8 @@ import "../ui"
 Item {
     id: center
     property var win
+    // fewer visible notifications on small screens so the bottom row always fits
+    readonly property int notifRows: win && win.screen ? Math.max(1, Math.min(3, Math.floor((Math.min(900, win.screen.height - 60) - 608) / 62))) : 3
 
     SystemClock {
         id: clock
@@ -106,6 +109,35 @@ Item {
                 sub: Hypr.layout
                 active: true
                 onClicked: Hypr.nextLayout()
+            }
+        }
+
+        Row {
+            width: parent.width
+            spacing: 10
+            Tile {
+                width: (parent.width - 20) / 3
+                icon: Night.active ? "󰖔" : "󰖙"
+                title: Lang.t.nightLight
+                sub: Night.label
+                active: Night.mode !== "off"
+                onClicked: Night.cycle()
+            }
+            Tile {
+                width: (parent.width - 20) / 3
+                icon: Power.profileIcon
+                title: Lang.t.energy
+                sub: Power.profile === PowerProfile.PowerSaver ? Lang.t.profSaver : Power.profile === PowerProfile.Performance ? Lang.t.profPerf : Lang.t.profBalanced
+                active: Power.profile !== PowerProfile.Balanced
+                onClicked: Power.cycleProfile()
+            }
+            Tile {
+                width: (parent.width - 20) / 3
+                icon: Audio.micIcon
+                title: Lang.t.audioInput
+                sub: Audio.source === null ? "–" : Audio.micMuted ? Lang.t.off : Lang.t.on
+                active: Audio.source !== null && !Audio.micMuted
+                onClicked: Audio.toggleMic()
             }
         }
 
@@ -256,7 +288,7 @@ Item {
 
             ListView {
                 width: parent.width
-                height: Math.min(Notifs.history.length, 3) * 62 - 8
+                height: Math.min(Notifs.history.length, center.notifRows) * 62 - 8
                 spacing: 8
                 clip: true
                 boundsBehavior: Flickable.StopAtBounds
