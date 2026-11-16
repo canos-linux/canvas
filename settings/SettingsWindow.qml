@@ -11,7 +11,7 @@ LazyLoader {
         id: win
         title: Lang.t.settingsTitle
         implicitWidth: 820
-        implicitHeight: 580
+        implicitHeight: 640
         color: Theme.base
         onVisibleChanged: if (!visible) IslandState.settingsOpen = false
 

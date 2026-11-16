@@ -13,6 +13,8 @@ import "shot"
 import "welcome"
 
 ShellRoot {
+    readonly property bool hyprConfReady: HyprConf.ready
+
     Variants {
         model: Quickshell.screens
         Scope {
