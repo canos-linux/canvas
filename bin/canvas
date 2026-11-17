@@ -4,17 +4,27 @@ dir="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
 if [ -z "$CANVAS_EDITION" ]; then
     if [ -f "$HOME/.config/canvas/private.json" ]; then export CANVAS_EDITION=private; else export CANVAS_EDITION=community; fi
 fi
+# SIGTERM instead of "qs kill": quitting through IPC can crash Quickshell while it tears down (crash dialog)
+stop_canvas() {
+    pkill -TERM -f "qs -p $dir/shell.qml" 2>/dev/null
+    for _ in 1 2 3 4 5 6 7 8 9 10; do
+        pgrep -f "qs -p $dir/shell.qml" >/dev/null || return 0
+        sleep 0.3
+    done
+    pkill -KILL -f "qs -p $dir/shell.qml" 2>/dev/null
+    sleep 0.3
+}
+
 case "$1" in
     start)
         pgrep -f "qs -p $dir/shell.qml" >/dev/null || setsid -f qs -p "$dir/shell.qml" >/tmp/canvas.log 2>&1
         command -v udiskie >/dev/null && ! pgrep -x udiskie >/dev/null && setsid -f udiskie -a -n -T >/dev/null 2>&1
         ;;
     stop)
-        qs kill -p "$dir/shell.qml" >/dev/null 2>&1
+        stop_canvas
         ;;
     restart)
-        qs kill -p "$dir/shell.qml" >/dev/null 2>&1
-        sleep 0.5
+        stop_canvas
         setsid -f qs -p "$dir/shell.qml" >/tmp/canvas.log 2>&1
         ;;
     log)

@@ -125,12 +125,17 @@ Singleton {
         return sp
     }
 
-    // first start: use only the best display (others off, not saved to disk)
+    // first start: use only the best display until the welcome setup is done.
+    // Written to monitors.lua: Hyprland reloads its config files when Canvas writes them,
+    // which would undo a runtime-only change.
     function firstStartSingle() {
         const main = mainName
         const code = mons.filter(m => m.name !== main && !m.disabled).map(m => 'hl.monitor({ output = "' + m.name + '", disabled = true })').join("\n")
-        if (code !== "") Quickshell.execDetached(["hyprctl", "eval", code])
-        focusMain()
+        console.info("Displays: first start, only", main)
+        if (code === "") return focusMain()
+        const file = "-- Written by Canvas (first start: only the main display until the welcome setup is done)\nhl.monitor({ output = \"\", mode = \"preferred\", position = \"auto\", scale = 1.0 })\n" + code + "\n"
+        writer.command = ["sh", "-c", 'mkdir -p "$1" && printf "%s" "$2" > "$1/monitors.lua"; hyprctl eval "$3" >/dev/null; hyprctl dispatch "hl.dsp.focus({ monitor = \\"$4\\" })" >/dev/null; true', "sh", dir, file, code, main]
+        writer.running = true
     }
 
     // welcome setup reached the display step (or was skipped): all displays on
@@ -152,7 +157,13 @@ Singleton {
 
     Process {
         id: writer
-        onExited: refreshLater.restart()
+        stderr: StdioCollector {
+            onStreamFinished: if (text.trim() !== "") console.warn("Displays writer:", text.trim())
+        }
+        onExited: (code, status) => {
+            console.info("Displays: settings written, exit", code)
+            refreshLater.restart()
+        }
     }
 
     Timer {
@@ -172,6 +183,7 @@ Singleton {
                 root.mons = list
                 root.changed()
                 if (!root.ready) {
+                    console.info("Displays:", list.map(m => m.name + (m.disabled ? "(off)" : "")).join(" "), "main", root.mainName, "firstStart", root.firstStart)
                     if (root.firstStart && list.filter(m => !m.disabled).length > 1) root.firstStartSingle()
                     else root.focusMain()
                     root.ready = true
