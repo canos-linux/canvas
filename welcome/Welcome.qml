@@ -33,7 +33,7 @@ LazyLoader {
             { code: "es", name: "Español" },
             { code: "it", name: "Italiano" }
         ]
-        readonly property string kb: Config.opt.kbLayouts !== "" ? Config.opt.kbLayouts.split(",")[0] : (Hypr.layout === "UK" ? "gb" : Hypr.layout.toLowerCase())
+        readonly property string kb: Config.opt.kbLayouts !== "" ? Config.opt.kbLayouts.split(",")[0] : Hypr.layoutCode
 
         function setKb(code) {
             Config.opt.kbLayouts = code

@@ -9,6 +9,7 @@ Singleton {
     property int active: 1
     property var occupied: []
     property string layout: "DE"
+    property string layoutCode: ""
     property string focusedMonitor: ""
     property var busy: ({})
     property int last: -1
@@ -62,7 +63,11 @@ Singleton {
             onStreamFinished: {
                 const keyboards = JSON.parse(text).keyboards
                 const main = keyboards.find(k => k.main) || keyboards[0]
-                if (main) root.layout = root.shortName(main.active_keymap)
+                if (main) {
+                    root.layout = root.shortName(main.active_keymap)
+                    const codes = (main.layout || "").split(",")
+                    root.layoutCode = codes[Math.max(0, main.active_layout_index || 0)] || codes[0] || ""
+                }
             }
         }
     }
