@@ -1,0 +1,3 @@
+#!/bin/sh
+# Login screen (greetd default_session): Hyprland + Canvas greeter, without log text on the screen
+exec Hyprland --config /usr/share/canvas/greeter/hyprland.lua >/dev/null 2>&1

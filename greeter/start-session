@@ -1,0 +1,3 @@
+#!/bin/sh
+# Desktop session started by the login screen (and the live autologin), without log text on the screen
+exec start-hyprland >/dev/null 2>&1

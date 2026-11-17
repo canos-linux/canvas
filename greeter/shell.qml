@@ -65,7 +65,7 @@ ShellRoot {
         }
         function onReadyToLaunch() {
             root.status = "launch"
-            Greetd.launch(["start-hyprland"])
+            Greetd.launch(["/usr/share/canvas/greeter/start-session"])
         }
     }
 

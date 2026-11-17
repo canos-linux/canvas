@@ -5,7 +5,7 @@ cat > /etc/greetd/config.toml <<'CFG'
 vt = 1
 
 [default_session]
-command = "Hyprland --config /usr/share/canvas/greeter/hyprland.lua"
+command = "/usr/share/canvas/greeter/start-greeter"
 user = "greeter"
 CFG
 ln -sf /usr/lib/systemd/system/greetd.service /etc/systemd/system/display-manager.service
