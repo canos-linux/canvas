@@ -2,6 +2,7 @@
 import Quickshell
 import Quickshell.Io
 import Quickshell.Services.Greetd
+import Quickshell.Wayland
 import QtQuick
 
 ShellRoot {
@@ -11,6 +12,9 @@ ShellRoot {
     property int index: 0
     readonly property var user: users.length > 0 ? users[index] : null
     property string status: ""
+    property string password: ""
+    property string mainName: ""
+    signal wrong()
     readonly property string themeDir: Quickshell.shellDir + "/../themes/canvas"
     readonly property color base: "#0d0b14"
     readonly property color surface: "#1d1a26"
@@ -48,17 +52,16 @@ ShellRoot {
     Connections {
         target: Greetd
         function onAuthMessage(message, error, responseRequired, echoResponse) {
-            if (responseRequired) Greetd.respond(pw.text)
+            if (responseRequired) Greetd.respond(root.password)
         }
         function onAuthFailure(message) {
             root.status = "wrong"
-            pw.text = ""
-            shake.restart()
+            root.wrong()
             Greetd.cancelSession()
         }
         function onError(error) {
             root.status = "wrong"
-            shake.restart()
+            root.wrong()
         }
         function onReadyToLaunch() {
             root.status = "launch"
@@ -66,15 +69,54 @@ ShellRoot {
         }
     }
 
+    // Login only on the main display: the one chosen in Canvas (/var/lib/canos/main-display),
+    // otherwise the biggest one with the highest refresh rate. Other displays only show the background.
+    Process {
+        running: true
+        command: ["sh", "-c", "cat /var/lib/canos/main-display 2>/dev/null; echo '|||'; hyprctl monitors -j"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const parts = text.split("|||")
+                const want = parts[0].trim()
+                let mons = []
+                try { mons = JSON.parse(parts[1]) } catch (e) {}
+                let main = mons.find(m => m.name === want)
+                if (!main && mons.length) main = mons.slice().sort((a, b) => b.width * b.height - a.width * a.height || b.refreshRate - a.refreshRate)[0]
+                root.mainName = main ? main.name : (Quickshell.screens.length ? Quickshell.screens[0].name : "")
+                if (main) Quickshell.execDetached(["hyprctl", "dispatch", 'hl.dsp.focus({ monitor = "' + main.name + '" })'])
+            }
+        }
+    }
+
+    Timer {
+        interval: 2500
+        running: root.mainName === ""
+        onTriggered: root.mainName = Quickshell.screens.length ? Quickshell.screens[0].name : ""
+    }
+
     SystemClock {
         id: clock
         precision: SystemClock.Minutes
     }
 
-    FloatingWindow {
+    Variants {
+        model: Quickshell.screens
+
+    PanelWindow {
         id: win
-        implicitWidth: 1920
-        implicitHeight: 1080
+        required property var modelData
+        readonly property bool isMain: modelData.name === root.mainName
+        screen: modelData
+        anchors {
+            top: true
+            left: true
+            right: true
+            bottom: true
+        }
+        exclusionMode: ExclusionMode.Ignore
+        WlrLayershell.layer: WlrLayer.Overlay
+        WlrLayershell.namespace: "canos-greeter"
+        WlrLayershell.keyboardFocus: isMain ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
         color: root.base
 
         Image {
@@ -88,6 +130,20 @@ ShellRoot {
         Rectangle {
             anchors.fill: parent
             color: Qt.rgba(0.05, 0.04, 0.08, 0.45)
+        }
+
+        Item {
+        anchors.fill: parent
+        visible: win.isMain
+        opacity: visible ? 1 : 0
+        Behavior on opacity { NumberAnimation { duration: 300 } }
+
+        Connections {
+            target: root
+            function onWrong() {
+                pw.text = ""
+                shake.restart()
+            }
         }
 
         Row {
@@ -249,7 +305,11 @@ ShellRoot {
                     font.pixelSize: 18
                     focus: true
                     clip: true
-                    onTextChanged: if (root.status === "wrong") root.status = ""
+                    onTextChanged: {
+                        root.password = text
+                        if (root.status === "wrong") root.status = ""
+                    }
+                    onVisibleChanged: if (visible) forceActiveFocus()
                     Keys.onReturnPressed: root.login()
                     Keys.onEnterPressed: root.login()
                     Keys.onEscapePressed: text = ""
@@ -339,5 +399,7 @@ ShellRoot {
             font.family: root.font
             font.pixelSize: 14
         }
+        }
+    }
     }
 }

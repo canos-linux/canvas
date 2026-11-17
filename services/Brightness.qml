@@ -9,21 +9,26 @@ Singleton {
     property int raw: -1
     property int max: 1
     property string device: ""
+    readonly property bool available: device !== ""
     signal bumped()
 
     function set(v) {
+        if (!available) return
         value = Math.max(0.05, Math.min(1, v))
-        setter.command = ["brightnessctl", "-q", "s", Math.round(value * 100) + "%"]
+        setter.command = ["brightnessctl", "-q", "-d", device, "s", Math.round(value * 100) + "%"]
         setter.running = true
     }
 
-    function refresh() { query.running = true }
+    function refresh() { if (available) query.running = true }
 
     Process {
         running: true
         command: ["sh", "-c", "ls /sys/class/backlight | head -1"]
         stdout: StdioCollector {
-            onStreamFinished: root.device = text.trim()
+            onStreamFinished: {
+                root.device = text.trim()
+                root.refresh()
+            }
         }
     }
 
@@ -56,7 +61,7 @@ Singleton {
 
     Process {
         id: query
-        command: ["brightnessctl", "-m"]
+        command: ["brightnessctl", "-m", "-d", root.device]
         stdout: StdioCollector {
             onStreamFinished: {
                 const parts = text.trim().split(",")
@@ -67,5 +72,4 @@ Singleton {
 
     Process { id: setter }
 
-    Component.onCompleted: refresh()
 }

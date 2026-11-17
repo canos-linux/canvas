@@ -4,24 +4,58 @@ import Quickshell.Widgets
 import "../core"
 import "../services"
 import "../ui"
+import "../settings"
 
 LazyLoader {
-    active: IslandState.welcomeOpen || (Edition.ready && !Edition.priv && !Config.opt.welcomeDone)
+    active: IslandState.welcomeOpen || (Edition.ready && Displays.ready && !Edition.priv && !Config.opt.welcomeDone)
 
     FloatingWindow {
         id: win
         title: Lang.t.welcomeTitle
         implicitWidth: 780
-        implicitHeight: 540
+        implicitHeight: 620
         color: Theme.base
         property int step: 0
-        readonly property int steps: 4
+        // display step only with more than one display
+        readonly property int d: multi ? 1 : 0
+        readonly property bool multi: Displays.count > 1
+        readonly property int steps: 4 + d
         readonly property bool live: Quickshell.env("USER") === "liveuser"
+        property bool displaysOn: false
+        readonly property var kbOptions: [
+            { code: "us", name: "English (US)" },
+            { code: "gb", name: "English (UK)" },
+            { code: "de", name: "Deutsch" },
+            { code: "at", name: "Deutsch (AT)" },
+            { code: "ch", name: "Deutsch (CH)" },
+            { code: "tr", name: "Türkçe" },
+            { code: "fr", name: "Français" },
+            { code: "es", name: "Español" },
+            { code: "it", name: "Italiano" }
+        ]
+        readonly property string kb: Config.opt.kbLayouts !== "" ? Config.opt.kbLayouts.split(",")[0] : (Hypr.layout === "UK" ? "gb" : Hypr.layout.toLowerCase())
+
+        function setKb(code) {
+            Config.opt.kbLayouts = code
+            HyprConf.save()
+            // live session: the installer takes this layout as its default
+            if (live) Quickshell.execDetached(["sh", "-c", "sudo -n localectl set-x11-keymap \"$1\"; sudo -n localectl set-keymap \"$1\" 2>/dev/null; true", "sh", code])
+        }
+
+        function showDisplays() {
+            if (displaysOn) return
+            displaysOn = true
+            if (Displays.firstStart) Displays.enableAll()
+        }
 
         function finish() {
+            if (multi && !displaysOn && Displays.firstStart) Displays.enableAll()
+            Config.opt.displaySetup = true
             Config.opt.welcomeDone = true
             IslandState.welcomeOpen = false
         }
+
+        onStepChanged: if (multi && step === 1) showDisplays()
 
         onVisibleChanged: if (!visible) finish()
         Component.onCompleted: CurrentTheme.refresh()
@@ -102,7 +136,7 @@ LazyLoader {
                 Column {
                     anchors.centerIn: parent
                     spacing: 14
-                    Logo { anchors.horizontalCenter: parent.horizontalCenter }
+                    Logo { anchors.horizontalCenter: parent.horizontalCenter; width: 84; height: 84 }
                     Txt {
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: Lang.t.welcomeTitle
@@ -127,13 +161,78 @@ LazyLoader {
                         options: ["English", "Deutsch"]
                         values: ["en", "de"]
                         value: Lang.code
-                        onPicked: v => Config.opt.language = v
+                        onPicked: v => {
+                            Config.opt.language = v
+                            if (v === "de" && Config.opt.kbLayouts === "") win.setKb("de")
+                        }
+                    }
+                    Txt {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        text: Lang.t.welcomeKeyboard
+                        size: 13
+                        color: Theme.subtext
+                        topPadding: 10
+                    }
+                    Flow {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        width: 560
+                        spacing: 8
+                        Repeater {
+                            model: win.kbOptions
+                            Rectangle {
+                                id: chip
+                                required property var modelData
+                                readonly property bool on: win.kb === modelData.code
+                                width: chipTxt.implicitWidth + 28
+                                height: 32
+                                radius: 16
+                                color: on ? Theme.accent : chipArea.containsMouse ? Theme.surfaceHigh : Theme.alpha(Theme.surfaceHigh, 0.6)
+                                Behavior on color { ColorAnimation { duration: Theme.dur(150) } }
+                                Txt {
+                                    id: chipTxt
+                                    anchors.centerIn: parent
+                                    text: chip.modelData.name
+                                    size: 13
+                                    color: chip.on ? Theme.base : Theme.text
+                                    weight: chip.on ? Font.DemiBold : Font.Normal
+                                }
+                                MouseArea {
+                                    id: chipArea
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    onClicked: win.setKb(chip.modelData.code)
+                                }
+                            }
+                        }
                     }
                 }
             }
 
             Page {
                 index: 1
+                visible: win.multi && opacity > 0
+                Column {
+                    anchors.fill: parent
+                    spacing: 6
+                    Txt { text: Lang.t.welcomeDisplays; size: 26; weight: Font.Bold }
+                    Txt { width: parent.width; text: Lang.t.welcomeDisplaysSub; size: 14; color: Theme.subtext; wrapMode: Text.WordWrap; bottomPadding: 10 }
+                    Flickable {
+                        width: parent.width
+                        height: parent.height - y
+                        contentHeight: dispPage.implicitHeight
+                        clip: true
+                        DisplayPage {
+                            id: dispPage
+                            width: parent.width
+                            compact: true
+                            visible: win.displaysOn
+                        }
+                    }
+                }
+            }
+
+            Page {
+                index: 1 + win.d
                 Column {
                     anchors.fill: parent
                     spacing: 6
@@ -199,7 +298,7 @@ LazyLoader {
             }
 
             Page {
-                index: 2
+                index: 2 + win.d
                 Column {
                     anchors.fill: parent
                     spacing: 6
@@ -245,7 +344,7 @@ LazyLoader {
             }
 
             Page {
-                index: 3
+                index: 3 + win.d
                 Column {
                     anchors.centerIn: parent
                     spacing: 16

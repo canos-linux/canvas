@@ -1,13 +1,13 @@
 #!/bin/bash
 # Runs inside the installed system (Calamares shellprocess).
-cat > /etc/greetd/config.toml <<'EOF'
+cat > /etc/greetd/config.toml <<'CFG'
 [terminal]
 vt = 1
 
 [default_session]
-command = "cage -s -- env QT_WAYLAND_DISABLE_WINDOWDECORATION=1 XDG_CACHE_HOME=/tmp/canos-greeter qs -p /usr/share/canvas/greeter/shell.qml"
+command = "Hyprland --config /usr/share/canvas/greeter/hyprland.lua"
 user = "greeter"
-EOF
+CFG
 ln -sf /usr/lib/systemd/system/greetd.service /etc/systemd/system/display-manager.service
 rm -f /etc/sudoers.d/g_wheel
 rm -f /etc/polkit-1/rules.d/49-nopasswd_global.rules

@@ -32,6 +32,7 @@ Singleton {
 
     FileView {
         path: root.path
+        blockLoading: true
         watchChanges: true
         onFileChanged: reload()
         onAdapterUpdated: writeAdapter()
@@ -74,6 +75,9 @@ Singleton {
             property real touchpadSpeed: 0
             property real mouseSpeed: 0
             property string kbLayouts: ""
+            property string mainDisplay: ""
+            property string displays: ""
+            property bool displaySetup: false
         }
     }
 }

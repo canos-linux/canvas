@@ -34,14 +34,14 @@ FocusScope {
         if (a === "lock") {
             IslandState.lock()
         } else if (a === "logout") {
-            Quickshell.execDetached(["sh", "-c", "loginctl terminate-session \"$XDG_SESSION_ID\""])
+            IslandState.power("logout")
         } else if (a === "suspend") {
             if (Config.lockOn) IslandState.lock()
             Quickshell.execDetached(["sh", "-c", "sleep 0.6; systemctl suspend"])
         } else if (a === "reboot") {
-            Quickshell.execDetached(["systemctl", "reboot"])
+            IslandState.power("reboot")
         } else if (a === "off") {
-            Quickshell.execDetached(["systemctl", "poweroff"])
+            IslandState.power("off")
         }
     }
 

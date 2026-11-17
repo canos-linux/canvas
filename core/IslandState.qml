@@ -25,6 +25,35 @@ Singleton {
     property string btPopName: ""
     property string btPopIcon: ""
     property real btPopBattery: -1
+    property string powerAction: ""
+
+    // shutdown / restart / logout: Canvas fades out first, then the system takes over (Plymouth)
+    function power(action) {
+        if (powerAction !== "") return
+        closeAll()
+        settingsOpen = false
+        powerAction = action
+        powerTimer.restart()
+    }
+
+    Timer {
+        id: powerTimer
+        interval: 1300
+        onTriggered: {
+            const a = root.powerAction
+            if (a === "off") Quickshell.execDetached(["systemctl", "poweroff"])
+            else if (a === "reboot") Quickshell.execDetached(["systemctl", "reboot"])
+            else if (a === "logout") Quickshell.execDetached(["sh", "-c", "loginctl terminate-session \"$XDG_SESSION_ID\""])
+            // still running after a while (e.g. shutdown blocked): show the desktop again
+            powerReset.restart()
+        }
+    }
+
+    Timer {
+        id: powerReset
+        interval: 15000
+        onTriggered: root.powerAction = ""
+    }
 
     function flash(kind, ms) {
         temp = kind

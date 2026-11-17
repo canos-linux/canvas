@@ -11,9 +11,12 @@ import "wallpaper"
 import "lock"
 import "shot"
 import "welcome"
+import "overlay"
 
 ShellRoot {
     readonly property bool hyprConfReady: HyprConf.ready
+    // first start with several displays, main display focus
+    readonly property bool displaysReady: Displays.ready
 
     Variants {
         model: Quickshell.screens
@@ -24,6 +27,8 @@ ShellRoot {
             Catcher { screen: screenScope.modelData }
             Island { screen: screenScope.modelData }
             RegionShot { screen: screenScope.modelData }
+            Identify { screen: screenScope.modelData }
+            PowerFade { screen: screenScope.modelData }
         }
     }
 

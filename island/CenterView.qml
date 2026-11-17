@@ -174,6 +174,7 @@ Item {
         }
 
         Row {
+            visible: Brightness.available
             width: parent.width
             spacing: 12
             Icon {
