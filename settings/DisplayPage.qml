@@ -237,13 +237,13 @@ Column {
                 id: tile
                 required property var modelData
                 readonly property var s: page.specs[modelData.name]
-                readonly property var z: Displays.sizeOf(s)
+                readonly property var sz: Displays.sizeOf(s)
                 readonly property bool isSel: page.sel === modelData.name
                 readonly property bool isMain: page.main === modelData.name
                 x: area.ox + (s.x - area.box.x) * area.f
                 y: area.oy + (s.y - area.box.y) * area.f
-                width: z.w * area.f - 4
-                height: z.h * area.f - 4
+                width: sz.w * area.f - 4
+                height: sz.h * area.f - 4
                 radius: 10
                 z: tileArea.drag.active ? 2 : 1
                 color: isSel ? Theme.alpha(Theme.accent, 0.3) : Theme.surfaceHigh

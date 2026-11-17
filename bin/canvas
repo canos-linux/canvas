@@ -23,7 +23,7 @@ case "$1" in
     settings)
         if [ -n "$2" ]; then qs -p "$dir/shell.qml" ipc call island settingspage "$2"; else qs -p "$dir/shell.qml" ipc call island settings; fi
         ;;
-    launcher|themes|center|lock|lockpreview|power|wifi|bluetooth|audio|micmute|nightlight|profile|nightlight|profile|charge|clipboard|screenshot|welcome)
+    launcher|themes|center|lock|lockpreview|power|wifi|bluetooth|audio|micmute|nightlight|profile|nightlight|profile|charge|clipboard|screenshot|welcome|powerpreview|identify)
         qs -p "$dir/shell.qml" ipc call island "$1"
         ;;
     theme)

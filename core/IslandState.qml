@@ -45,8 +45,18 @@ Singleton {
             else if (a === "reboot") Quickshell.execDetached(["systemctl", "reboot"])
             else if (a === "logout") Quickshell.execDetached(["sh", "-c", "loginctl terminate-session \"$XDG_SESSION_ID\""])
             // still running after a while (e.g. shutdown blocked): show the desktop again
+            powerReset.interval = 15000
             powerReset.restart()
         }
+    }
+
+    // preview of the animation without shutting down (canvas powerpreview)
+    function powerPreview() {
+        if (powerAction !== "") return
+        closeAll()
+        powerAction = "off"
+        powerReset.interval = 3500
+        powerReset.restart()
     }
 
     Timer {

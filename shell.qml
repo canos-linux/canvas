@@ -130,6 +130,12 @@ ShellRoot {
         function welcome(): void {
             IslandState.welcomeOpen = true
         }
+        function powerpreview(): void {
+            IslandState.powerPreview()
+        }
+        function identify(): void {
+            Displays.identify()
+        }
         function lockpreview(): void {
             IslandState.lockPreview = true
         }
