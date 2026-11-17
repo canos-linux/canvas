@@ -81,7 +81,17 @@ ShellRoot {
                 let mons = []
                 try { mons = JSON.parse(parts[1]) } catch (e) {}
                 let main = mons.find(m => m.name === want)
-                if (!main && mons.length) main = mons.slice().sort((a, b) => b.width * b.height - a.width * a.height || b.refreshRate - a.refreshRate)[0]
+                // biggest, then highest possible refresh rate (monitors often start at 60 Hz)
+                const top = m => {
+                    let px = m.width * m.height, hz = m.refreshRate
+                    for (const s of (m.availableModes || [])) {
+                        const p = s.split("@"), r = p[0].split("x").map(Number), f = parseFloat(p[1])
+                        if (r[0] * r[1] > px) px = r[0] * r[1]
+                        if (f > hz) hz = f
+                    }
+                    return { px: px, hz: hz }
+                }
+                if (!main && mons.length) main = mons.slice().sort((a, b) => top(b).px - top(a).px || top(b).hz - top(a).hz)[0]
                 root.mainName = main ? main.name : (Quickshell.screens.length ? Quickshell.screens[0].name : "")
                 if (main) Quickshell.execDetached(["hyprctl", "dispatch", 'hl.dsp.focus({ monitor = "' + main.name + '" })'])
             }

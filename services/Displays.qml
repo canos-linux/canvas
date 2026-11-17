@@ -19,9 +19,23 @@ Singleton {
     readonly property bool firstStart: !Config.opt.displaySetup && !Config.opt.welcomeDone && !Edition.priv
     signal changed()
 
+    // biggest resolution, then highest possible refresh rate (monitors often start at 60 Hz)
+    function maxMode(m) {
+        let px = m.width * m.height, hz = m.refreshRate
+        for (const s of (m.availableModes || [])) {
+            const p = s.split("@"), r = p[0].split("x").map(Number), f = parseFloat(p[1])
+            if (r[0] * r[1] > px) px = r[0] * r[1]
+            if (f > hz) hz = f
+        }
+        return { px: px, hz: hz }
+    }
+
     function best(list) {
         if (!list || !list.length) return ""
-        const s = list.slice().sort((a, b) => b.width * b.height - a.width * a.height || b.refreshRate - a.refreshRate)
+        const s = list.slice().sort((a, b) => {
+            const ma = maxMode(a), mb = maxMode(b)
+            return mb.px - ma.px || mb.hz - ma.hz
+        })
         return s[0].name
     }
 
