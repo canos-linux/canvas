@@ -70,8 +70,8 @@ Column {
             Row {
                 spacing: 8
                 topPadding: 8
-                PillButton { text: Lang.t.website; onClicked: Quickshell.execDetached(["xdg-open", "https://tschaki11.github.io/canos/"]) }
-                PillButton { text: Lang.t.reportBug; onClicked: Quickshell.execDetached(["xdg-open", "https://github.com/tschaki11/canos-iso/issues"]) }
+                PillButton { text: Lang.t.website; onClicked: Quickshell.execDetached(["xdg-open", "https://canos-linux.github.io/"]) }
+                PillButton { text: Lang.t.reportBug; onClicked: Quickshell.execDetached(["xdg-open", "https://github.com/canos-linux/canos-iso/issues"]) }
             }
         }
     }

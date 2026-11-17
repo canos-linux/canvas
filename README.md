@@ -1,6 +1,6 @@
 # Canvas
 
-The desktop of **[CanOS](https://tschaki11.github.io/canos/)** – a shell for Hyprland, built with [Quickshell](https://quickshell.org).
+The desktop of **[CanOS](https://canos-linux.github.io/)** – a shell for Hyprland, built with [Quickshell](https://quickshell.org).
 
 **Yes, I CanOS.**
 
