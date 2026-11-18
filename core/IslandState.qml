@@ -43,7 +43,7 @@ Singleton {
             const a = root.powerAction
             if (a === "off") Quickshell.execDetached(["systemctl", "poweroff"])
             else if (a === "reboot") Quickshell.execDetached(["systemctl", "reboot"])
-            else if (a === "logout") Quickshell.execDetached(["sh", "-c", "loginctl terminate-session \"$XDG_SESSION_ID\""])
+            else if (a === "logout") Quickshell.execDetached(["sh", "-c", "if [ -e /run/canvas/greeter-restart ]; then systemctl reboot; else loginctl terminate-session \"$XDG_SESSION_ID\"; fi"])
             // still running after a while (e.g. shutdown blocked): show the desktop again
             powerReset.interval = 15000
             powerReset.restart()

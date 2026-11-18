@@ -260,10 +260,17 @@ FocusScope {
                 required property string ssid
                 required property int level
                 required property bool secure
+                required property bool enterprise
                 required property string band
                 required property bool active
                 required property bool saved
-                readonly property var n: ({ ssid: ssid, level: level, secure: secure, band: band, active: active, saved: saved })
+                readonly property var n: ({ ssid: ssid, level: level, secure: secure, enterprise: enterprise, band: band, active: active, saved: saved })
+                property string eap: "peap"
+                function join() {
+                    if (pw.text === "") return
+                    if (n.enterprise) { if (user.text !== "") Net.connectEnterprise(n.ssid, user.text, pw.text, eap) }
+                    else Net.connect(n.ssid, pw.text, false)
+                }
                 readonly property bool expanded: wv.open === n.ssid
                 readonly property bool connecting: Net.busy === n.ssid
                 width: list.width
@@ -377,6 +384,14 @@ FocusScope {
                         Pill { icon: "󰆴"; text: Lang.t.wifiForget; onClicked: { wv.open = ""; Net.forget(row.n.ssid) } }
                     }
 
+                    Field {
+                        id: user
+                        visible: !row.n.active && row.n.enterprise
+                        width: parent.width
+                        placeholder: Lang.t.wifiUser
+                        onAccepted: pw.input.forceActiveFocus()
+                    }
+
                     Row {
                         visible: !row.n.active
                         width: parent.width
@@ -386,15 +401,23 @@ FocusScope {
                             width: parent.width - go.width - 8
                             password: true
                             placeholder: Lang.t.wifiPassword
-                            onAccepted: if (text !== "") Net.connect(row.n.ssid, text, false)
+                            onAccepted: row.join()
                         }
                         Pill {
                             id: go
                             primary: true
                             height: 38
                             text: Lang.t.wifiConnect
-                            onClicked: if (pw.text !== "") Net.connect(row.n.ssid, pw.text, false)
+                            onClicked: row.join()
                         }
+                    }
+
+                    Row {
+                        visible: !row.n.active && row.n.enterprise
+                        spacing: 8
+                        Txt { text: Lang.t.wifiEap; size: 12; anchors.verticalCenter: parent.verticalCenter }
+                        Pill { text: "PEAP"; active: row.eap === "peap"; onClicked: row.eap = "peap" }
+                        Pill { text: "TTLS"; active: row.eap === "ttls"; onClicked: row.eap = "ttls" }
                     }
 
                     Txt {

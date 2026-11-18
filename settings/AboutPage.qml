@@ -139,7 +139,7 @@ Column {
             PillButton {
                 text: Lang.t.updatesRun
                 primary: page.updates > 0
-                onClicked: Quickshell.execDetached(["kitty", "--title", "CanOS Update", "-e", "canos-update"])
+                onClicked: Quickshell.execDetached(["env", "LANG=" + (Lang.code === "de" ? "de_AT.UTF-8" : "en_US.UTF-8"), "LANGUAGE=" + Lang.code, "LC_MESSAGES=", "LC_ALL=", "kitty", "--title", "CanOS Update", "-e", "canos-update"])
             }
         }
     }

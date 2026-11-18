@@ -24,6 +24,7 @@ Singleton {
     property string busy: ""
     property string error: ""
     property string errorFor: ""
+    property bool eapTry: false
     property string qrPath: ""
     property string qrSsid: ""
     property string qrPassword: ""
@@ -72,6 +73,7 @@ Singleton {
     }
 
     function connect(ssid, password, hidden) {
+        eapTry = false
         const known = saved.indexOf(ssid) !== -1
         if (known && password === "")
             run("connect", ssid, "nmcli -w 30 connection up id \"$1\"", [ssid])
@@ -81,6 +83,12 @@ Singleton {
             run("connect", ssid, "nmcli -w 30 dev wifi connect \"$1\" password \"$2\" hidden \"$3\"", [ssid, password, hidden ? "yes" : "no"])
         else
             run("connect", ssid, "nmcli -w 30 dev wifi connect \"$1\" hidden \"$2\"", [ssid, hidden ? "yes" : "no"])
+    }
+
+    // WPA2/3-Enterprise (802.1X), e.g. school and university networks
+    function connectEnterprise(ssid, user, password, eap) {
+        eapTry = true
+        run("connect", ssid, "nmcli connection delete id \"$1\" >/dev/null 2>&1; nmcli connection add type wifi con-name \"$1\" ssid \"$1\" wifi-sec.key-mgmt wpa-eap 802-1x.eap \"$4\" 802-1x.phase2-auth mschapv2 802-1x.identity \"$2\" 802-1x.password \"$3\" >/dev/null && nmcli -w 30 connection up id \"$1\"", [ssid, user, password, eap])
     }
 
     function disconnect(ssid) {
@@ -117,7 +125,7 @@ Singleton {
         if (kind === "connect") {
             if (code !== 0) {
                 const e = actErr.text + actOut.text
-                error = /secret|password|psk|802-1x|key/i.test(e) ? Lang.t.wifiWrongPw : Lang.t.wifiFailed
+                error = /secret|password|psk|802-1x|key/i.test(e) ? (root.eapTry ? Lang.t.wifiWrongLogin : Lang.t.wifiWrongPw) : Lang.t.wifiFailed
                 errorFor = ssid
                 if (!actProc.wasSaved) Quickshell.execDetached(["nmcli", "connection", "delete", "id", ssid])
             }
@@ -149,7 +157,7 @@ Singleton {
                         const f = root.fields(l.slice(5))
                         const name = f.slice(4).join(":")
                         if (name === "") continue
-                        const n = { ssid: name, level: parseInt(f[1]) || 0, secure: f[2] !== "" && f[2] !== "--", band: root.band(f[3]), active: f[0] === "*" }
+                        const n = { ssid: name, level: parseInt(f[1]) || 0, secure: f[2] !== "" && f[2] !== "--", enterprise: /802\.1X/.test(f[2]), band: root.band(f[3]), active: f[0] === "*" }
                         const o = nets[name]
                         if (!o || n.active || (!o.active && n.level > o.level)) nets[name] = n
                     }
