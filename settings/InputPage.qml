@@ -26,6 +26,11 @@ Column {
         HyprConf.save()
     }
 
+    function setTermKeys(on) {
+        Config.opt.termCopyPaste = on
+        Quickshell.execDetached(["sh", "-c", 'd="$HOME/.config/kitty"; mkdir -p "$d"; if [ "$1" = 1 ]; then printf "map ctrl+c copy_or_interrupt\\nmap ctrl+v paste_from_clipboard\\n" > "$d/canvas-keys.conf"; else : > "$d/canvas-keys.conf"; fi; grep -qx "include canvas-keys.conf" "$d/kitty.conf" 2>/dev/null || echo "include canvas-keys.conf" >> "$d/kitty.conf"; pkill -USR1 -x kitty; true', "sh", on ? "1" : "0"])
+    }
+
     function setLayouts(list) {
         layouts = list
         set("kbLayouts", list.join(","))
@@ -162,5 +167,11 @@ Column {
                 }
             }
         }
+    }
+    SettingRow {
+        title: Lang.t.termCopyPaste
+        sub: Lang.t.termCopyPasteSub
+        height: 76
+        Toggle { checked: Config.opt.termCopyPaste; onToggled: v => page.setTermKeys(v) }
     }
 }

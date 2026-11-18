@@ -78,6 +78,7 @@ Singleton {
             property string mainDisplay: ""
             property string displays: ""
             property bool displaySetup: false
+            property bool termCopyPaste: false
         }
     }
 }
