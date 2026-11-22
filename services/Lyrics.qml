@@ -27,7 +27,17 @@ Singleton {
         if (!wanted || Media.title === "" || k === key) return
         key = k
         lines = []
-        q.command = ["sh", "-c", "curl -fsGm 10 'https://lrclib.net/api/get' --data-urlencode \"artist_name=$1\" --data-urlencode \"track_name=$2\" -H 'User-Agent: Canvas (CanOS)'", "sh", Media.artist, Media.title]
+        // YouTube & co: "Artist - Title (Official Video)" from some channel -> artist + clean title
+        let artist = Media.artist.replace(/ - Topic$/, "").replace(/VEVO$/i, "")
+        let title = Media.title
+        const dash = title.match(/^(.+?)\s+[-–—]\s+(.+)$/)
+        if (dash) {
+            artist = dash[1]
+            title = dash[2]
+        }
+        title = title.replace(/\s*[\(\[][^\)\]]*[\)\]]/g, "").replace(/\s+(ft\.?|feat\.?)\s.*$/i, "").trim()
+        artist = artist.replace(/\s*[\(\[][^\)\]]*[\)\]]/g, "").split(/,| & | x | feat/i)[0].trim()
+        q.command = ["sh", "-c", "curl -fsGm 10 'https://lrclib.net/api/get' --data-urlencode \"artist_name=$1\" --data-urlencode \"track_name=$2\" -H 'User-Agent: Canvas (CanOS)' || curl -fsGm 10 'https://lrclib.net/api/search' --data-urlencode \"q=$1 $2\" -H 'User-Agent: Canvas (CanOS)'", "sh", artist, title]
         q.running = true
     }
 
@@ -36,7 +46,9 @@ Singleton {
         stdout: StdioCollector {
             onStreamFinished: {
                 try {
-                    const s = JSON.parse(text).syncedLyrics || ""
+                    let d = JSON.parse(text)
+                    if (Array.isArray(d)) d = d.find(x => x.syncedLyrics) || {}
+                    const s = d.syncedLyrics || ""
                     const out = []
                     for (const l of s.split("\n")) {
                         const m = l.match(/^\[(\d+):(\d+(?:\.\d+)?)\]\s*(.*)$/)

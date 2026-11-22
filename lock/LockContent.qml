@@ -175,6 +175,7 @@ Item {
 
     LockExtras {
         anchors.fill: parent
+        z: 10
         opacity: clockCol.opacity
     }
 
