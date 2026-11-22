@@ -48,6 +48,9 @@ exec wf-recorder "$@"`]
                 }
             }
         }
+        stderr: StdioCollector {
+            onStreamFinished: if (text.trim() !== "") console.warn("recorder:", text.trim().split("\n").slice(-6).join(" | "))
+        }
         onRunningChanged: {
             if (!running) {
                 const was = root.active
