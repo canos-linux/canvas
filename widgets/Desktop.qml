@@ -108,14 +108,27 @@ PanelWindow {
             height: 130
             Column {
                 anchors.horizontalCenter: parent.horizontalCenter
-                Txt {
+                Row {
                     anchors.horizontalCenter: parent.horizontalCenter
-                    text: Qt.formatTime(clock.date, Config.opt.clock24 ? "HH:mm" : "h:mm")
+                    spacing: 8
+                Txt {
+                    // Qt: "h" without AP is still 24 h -> format with AP and show it small
+                    text: Config.opt.clock24 ? Qt.formatTime(clock.date, "HH:mm") : Qt.formatTime(clock.date, "h:mm AP").replace(/\s*[AP]M$/i, "")
                     size: 82
                     weight: Font.Bold
                     color: Theme.text
                     style: Text.Raised
                     styleColor: Theme.alpha(Theme.base, 0.5)
+                }
+                Txt {
+                    visible: !Config.opt.clock24
+                    anchors.bottom: parent.bottom
+                    anchors.bottomMargin: 18
+                    text: Qt.formatTime(clock.date, "AP")
+                    size: 22
+                    weight: Font.Bold
+                    color: Theme.accent
+                }
                 }
                 Txt {
                     anchors.horizontalCenter: parent.horizontalCenter
