@@ -10,7 +10,7 @@ PanelWindow {
     id: desk
     readonly property bool onLeft: Config.opt.widgetSide === "left"
 
-    visible: Config.opt.widgets && screen.name === (Displays.mainName || screen.name) && !Gaming.active
+    visible: Config.opt.widgets && !Gaming.active
     color: "transparent"
     exclusionMode: ExclusionMode.Ignore
     WlrLayershell.layer: WlrLayer.Bottom

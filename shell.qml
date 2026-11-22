@@ -29,7 +29,10 @@ ShellRoot {
             id: screenScope
             required property var modelData
             Wallpaper { screen: screenScope.modelData }
-            Desktop { screen: screenScope.modelData }
+            LazyLoader {
+                active: screenScope.modelData.name === (Displays.mainName || screenScope.modelData.name)
+                Desktop { screen: screenScope.modelData }
+            }
             Catcher { screen: screenScope.modelData }
             Island { screen: screenScope.modelData }
             RegionShot { screen: screenScope.modelData }
