@@ -46,7 +46,7 @@ PanelWindow {
                 opacity: playbackState === MediaPlayer.StoppedState ? 0 : 1
                 Behavior on opacity { NumberAnimation { duration: 400 } }
 
-                property bool shouldPlay: !wall.busy
+                property bool shouldPlay: !wall.busy && !Gaming.active
                 onShouldPlayChanged: shouldPlay ? play() : pause()
             }
         }

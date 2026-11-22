@@ -49,7 +49,8 @@ Singleton {
                 for (const m of monitors) {
                     if (m.focused) root.focusedMonitor = m.name
                     const ws = spaces.find(w => w.id === m.activeWorkspace.id)
-                    map[m.name] = (ws && ws.windows > 0) || (m.specialWorkspace && m.specialWorkspace.name !== "")
+                    // video wallpaper only pauses behind a fullscreen window
+                    map[m.name] = (ws && ws.hasfullscreen === true) || false
                 }
                 root.busy = map
             }
