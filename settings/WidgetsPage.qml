@@ -36,7 +36,15 @@ Column {
                 options: [Lang.t.sideLeft, Lang.t.sideRight]
                 values: ["left", "right"]
                 value: Config.opt.widgetSide
-                onPicked: v => Config.opt.widgetSide = v
+                onPicked: v => {
+                    // new side = widgets line up in the column again (moved ones of this theme too)
+                    let all = {}
+                    try { all = JSON.parse(Config.opt.widgetPos) } catch (e) {}
+                    delete all[CurrentTheme.name]
+                    delete all["*"]
+                    Config.opt.widgetPos = JSON.stringify(all)
+                    Config.opt.widgetSide = v
+                }
             }
         }
         SettingRow {
