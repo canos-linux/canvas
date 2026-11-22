@@ -34,6 +34,18 @@ Singleton {
     }
     onAccentOverrideChanged: if (Config.ownColorsOn && CurrentTheme.dir !== "") matugen.running = true
 
+    // login screen shows the current theme: copy picture + color to /var/lib/canos (readable by the greeter)
+    Timer {
+        id: loginCopy
+        interval: 2000
+        onTriggered: loginWriter.running = true
+    }
+    Process {
+        id: loginWriter
+        command: ["sh", "-c", "[ -w /var/lib/canos ] && [ -f \"$1/lock.png\" ] || exit 0; umask 002; cp \"$1/lock.png\" /var/lib/canos/login.png.tmp && mv -f /var/lib/canos/login.png.tmp /var/lib/canos/login.png; printf '%s' \"$2\" > /var/lib/canos/login-accent", "sh", CurrentTheme.dir, String(root.accent)]
+    }
+    onAccentChanged: loginCopy.restart()
+
     function alpha(c, a) {
         return Qt.rgba(c.r, c.g, c.b, a)
     }

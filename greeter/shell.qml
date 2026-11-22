@@ -18,7 +18,21 @@ ShellRoot {
     readonly property string themeDir: Quickshell.shellDir + "/../themes/canvas"
     readonly property color base: "#0d0b14"
     readonly property color surface: "#1d1a26"
-    readonly property color accent: "#b9a4ff"
+    // the user's current theme (written by Canvas into /var/lib/canos)
+    property string loginBg: ""
+    property color accent: "#b9a4ff"
+
+    Process {
+        running: true
+        command: ["sh", "-c", "[ -r /var/lib/canos/login.png ] && echo BG; cat /var/lib/canos/login-accent 2>/dev/null"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                if (text.indexOf("BG") !== -1) root.loginBg = "/var/lib/canos/login.png"
+                const m = text.match(/#[0-9a-fA-F]{6}/)
+                if (m) root.accent = m[0]
+            }
+        }
+    }
     readonly property color text: "#ece7f2"
     readonly property color subtext: "#b7b0c2"
     readonly property string font: "Google Sans Flex"
@@ -131,7 +145,7 @@ ShellRoot {
 
         Image {
             anchors.fill: parent
-            source: "file://" + root.themeDir + "/lock.png"
+            source: "file://" + (root.loginBg !== "" ? root.loginBg : root.themeDir + "/lock.png")
             fillMode: Image.PreserveAspectCrop
             opacity: root.status === "launch" ? 0 : 1
             Behavior on opacity { NumberAnimation { duration: 400 } }
