@@ -18,6 +18,19 @@ Column {
         enabled: Config.opt.widgets
 
         SettingRow {
+            title: Lang.t.widgetsMove
+            sub: Lang.t.widgetsMoveSub
+            PillButton {
+                text: Lang.t.widgetsReset
+                onClicked: {
+                    let all = {}
+                    try { all = JSON.parse(Config.opt.widgetPos) } catch (e) {}
+                    delete all[CurrentTheme.name]
+                    Config.opt.widgetPos = JSON.stringify(all)
+                }
+            }
+        }
+        SettingRow {
             title: Lang.t.widgetSide
             Segmented {
                 options: [Lang.t.sideLeft, Lang.t.sideRight]

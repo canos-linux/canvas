@@ -18,6 +18,7 @@ LazyLoader {
         property string page: IslandState.settingsPage || "look"
         property var pages: [
             { key: "look", icon: "󰏘", name: Lang.t.pageLook },
+            { key: "themes", icon: "󰸉", name: Lang.t.pageThemes, community: true },
             { key: "island", icon: "󱂬", name: Lang.t.pageIsland },
             { key: "center", icon: "󰕮", name: Lang.t.pageCenter },
             { key: "widgets", icon: "󰖲", name: Lang.t.pageWidgets },
@@ -82,7 +83,7 @@ LazyLoader {
                     Rectangle {
                         width: parent.width
                         height: visible ? 40 : 0
-                        visible: !modelData.priv || Edition.priv
+                        visible: (!modelData.priv || Edition.priv) && (!modelData.community || !Edition.priv)
                         radius: 14
                         color: win.page === modelData.key ? Theme.alpha(Theme.accent, 0.2) : navArea.containsMouse ? Theme.surfaceHigh : "transparent"
                         Behavior on color { ColorAnimation { duration: Theme.dur(150) } }
@@ -403,6 +404,7 @@ LazyLoader {
 
                 DisplayPage { visible: win.page === "display" }
                 WidgetsPage { visible: win.page === "widgets" }
+                ThemesPage { visible: win.page === "themes" }
                 GamingPage { visible: win.page === "gaming" }
                 PhonePage { visible: win.page === "phone" }
                 InputPage { visible: win.page === "input" }

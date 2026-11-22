@@ -28,6 +28,12 @@ Singleton {
     Behavior on accent { ColorAnimation { duration: 600 } }
     Behavior on accent2 { ColorAnimation { duration: 600 } }
 
+    // own color for the current theme (Settings › Themes), empty = from the picture
+    readonly property string accentOverride: {
+        try { return JSON.parse(Config.opt.themeAccents)[CurrentTheme.name] || "" } catch (e) { return "" }
+    }
+    onAccentOverrideChanged: if (Config.ownColorsOn && CurrentTheme.dir !== "") matugen.running = true
+
     function alpha(c, a) {
         return Qt.rgba(c.r, c.g, c.b, a)
     }
@@ -48,7 +54,7 @@ Singleton {
 
     Process {
         id: matugen
-        command: ["sh", "-c", "d=\"$1\"; if [ -f \"$d/matugen.png\" ]; then i=\"$d/matugen.png\"; t=scheme-fidelity; else i=\"$d/lock.png\"; t=scheme-tonal-spot; fi; matugen image \"$i\" -m dark -t $t --json hex --dry-run --prefer saturation 2>/dev/null", "sh", CurrentTheme.dir]
+        command: ["sh", "-c", "d=\"$1\"; if [ -n \"$2\" ]; then matugen color hex \"$2\" -m dark -t scheme-tonal-spot --json hex --dry-run 2>/dev/null; exit; fi; if [ -f \"$d/matugen.png\" ]; then i=\"$d/matugen.png\"; t=scheme-fidelity; else i=\"$d/lock.png\"; t=scheme-tonal-spot; fi; matugen image \"$i\" -m dark -t $t --json hex --dry-run --prefer saturation 2>/dev/null", "sh", CurrentTheme.dir, root.accentOverride]
         stdout: StdioCollector {
             onStreamFinished: {
                 try {

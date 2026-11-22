@@ -100,6 +100,9 @@ Singleton {
             property bool gameNoAnim: true
             property bool gameMuteSounds: true
             property bool phone: false
+            property string hiddenThemes: ""
+            property string themeAccents: "{}"
+            property string widgetPos: "{}"
         }
     }
 }

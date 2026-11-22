@@ -15,14 +15,34 @@ PanelWindow {
     exclusionMode: ExclusionMode.Ignore
     WlrLayershell.layer: WlrLayer.Bottom
     WlrLayershell.namespace: "canvas-widgets"
-    implicitWidth: 380
-    mask: Region { item: col }
+    mask: Region {
+        Region { item: clockW }
+        Region { item: weatherW }
+        Region { item: systemW }
+        Region { item: cal }
+        Region { item: music }
+    }
 
     anchors {
         top: true
         bottom: true
-        left: desk.onLeft
-        right: !desk.onLeft
+        left: true
+        right: true
+    }
+
+    // saved positions per theme, as fractions of the screen: { theme: { key: [fx, fy] } }
+    readonly property var saved: {
+        try { return (JSON.parse(Config.opt.widgetPos)[CurrentTheme.name]) || {} } catch (e) { return {} }
+    }
+    readonly property real colX: onLeft ? 24 : width - 356
+
+    function save(key, x, y) {
+        let all = {}
+        try { all = JSON.parse(Config.opt.widgetPos) } catch (e) {}
+        const t = Object.assign({}, all[CurrentTheme.name] || {})
+        t[key] = [Math.round(x / width * 1000) / 1000, Math.round(y / height * 1000) / 1000]
+        all[CurrentTheme.name] = t
+        Config.opt.widgetPos = JSON.stringify(all)
     }
 
     Binding {
@@ -31,8 +51,40 @@ PanelWindow {
         value: desk.visible && Config.opt.wSystem
     }
 
+    // a widget you can drag anywhere; without a saved position it sits in the column on the side
+    component Movable: Item {
+        id: mv
+        required property string key
+        property Item prev: null
+        readonly property real defY: prev ? prev.defY + (prev.visible ? prev.height + 16 : 0) : 80
+        readonly property var pos: desk.saved[key] || null
+        width: 332
+        x: pos ? Math.min(desk.width - width, pos[0] * desk.width) : desk.colX
+        y: pos ? Math.min(desk.height - height, pos[1] * desk.height) : defY
+        Behavior on x { enabled: !drag.active; NumberAnimation { duration: Theme.dur(300); easing.type: Easing.OutCubic } }
+        Behavior on y { enabled: !drag.active; NumberAnimation { duration: Theme.dur(300); easing.type: Easing.OutCubic } }
+        scale: drag.active ? 1.03 : 1
+        Behavior on scale { NumberAnimation { duration: 150 } }
+        z: drag.active ? 5 : 1
+        DragHandler {
+            id: drag
+            target: mv
+            xAxis.minimum: 0
+            xAxis.maximum: desk.width - mv.width
+            yAxis.minimum: 0
+            yAxis.maximum: desk.height - mv.height
+            onActiveChanged: {
+                if (!active) {
+                    desk.save(mv.key, mv.x, mv.y)
+                    mv.x = Qt.binding(() => mv.pos ? Math.min(desk.width - mv.width, mv.pos[0] * desk.width) : desk.colX)
+                    mv.y = Qt.binding(() => mv.pos ? Math.min(desk.height - mv.height, mv.pos[1] * desk.height) : mv.defY)
+                }
+            }
+        }
+    }
+
     component Card: Rectangle {
-        width: col.width
+        width: 332
         radius: 28
         color: Theme.alpha(Theme.base, 0.62)
         border.width: 1
@@ -44,20 +96,15 @@ PanelWindow {
         precision: SystemClock.Seconds
     }
 
-    Column {
+    Item {
         id: col
-        anchors.top: parent.top
-        anchors.topMargin: 80
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.leftMargin: 24
-        anchors.rightMargin: 24
-        spacing: 16
+        anchors.fill: parent
 
         // clock
-        Item {
+        Movable {
+            id: clockW
+            key: "clock"
             visible: Config.opt.wClock
-            width: col.width
             height: 130
             Column {
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -83,9 +130,14 @@ PanelWindow {
         }
 
         // weather
-        Card {
+        Movable {
+            id: weatherW
+            key: "weather"
+            prev: clockW
             visible: Config.opt.wWeather && Weather.ok
             height: 96
+        Card {
+            anchors.fill: parent
             Icon {
                 id: wIcon
                 anchors.left: parent.left
@@ -112,10 +164,17 @@ PanelWindow {
             }
         }
 
+        }
+
         // system
-        Card {
+        Movable {
+            id: systemW
+            key: "system"
+            prev: weatherW
             visible: Config.opt.wSystem
             height: 112
+        Card {
+            anchors.fill: parent
             Row {
                 anchors.centerIn: parent
                 spacing: 26
@@ -134,14 +193,19 @@ PanelWindow {
             }
         }
 
+        }
+
         // calendar
-        Card {
+        Movable {
             id: cal
+            key: "calendar"
+            prev: systemW
             visible: Config.opt.wCalendar
             height: calCol.implicitHeight + 32
             readonly property date first: new Date(clock.date.getFullYear(), clock.date.getMonth(), 1)
             readonly property int offset: (first.getDay() + 6) % 7
             readonly property int days: new Date(clock.date.getFullYear(), clock.date.getMonth() + 1, 0).getDate()
+            Card { anchors.fill: parent }
             Column {
                 id: calCol
                 anchors.centerIn: parent
@@ -189,11 +253,14 @@ PanelWindow {
         }
 
         // music
-        Card {
+        Movable {
             id: music
+            key: "music"
+            prev: cal
             visible: Config.opt.wMusic && Media.player !== null
             height: musicCol.implicitHeight + 36
             readonly property bool vinyl: Config.opt.musicStyle === "vinyl"
+            Card { anchors.fill: parent }
 
             Column {
                 id: musicCol
