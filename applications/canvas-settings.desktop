@@ -5,6 +5,6 @@ Name[de]=Canvas Einstellungen
 Comment=Themes, widgets, displays and more
 Comment[de]=Themes, Widgets, Bildschirme und mehr
 Exec=canvas settings
-Icon=preferences-system
+Icon=canvas-settings
 Categories=Settings;
 Keywords=settings;einstellungen;themes;widgets;

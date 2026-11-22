@@ -5,6 +5,6 @@ Name[de]=Canvas Store
 Comment=Install apps and games
 Comment[de]=Apps und Spiele installieren
 Exec=canvas store
-Icon=system-software-install
+Icon=canvas-store
 Categories=System;PackageManager;
 Keywords=store;apps;install;software;programme;
