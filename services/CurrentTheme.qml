@@ -174,7 +174,19 @@ rm -rf "$t"; echo "$n"`, "sh", path, userRoot, Quickshell.shellDir + "/themes"]
         onExited: code => root.hasVideo = code === 0
     }
 
-    onDirChanged: if (dir !== "") check.running = true
+    // restart the check: dir can change twice quickly at start (default theme, then yours)
+    onDirChanged: {
+        hasVideo = false
+        if (dir !== "") {
+            check.running = false
+            checkSoon.restart()
+        }
+    }
+    Timer {
+        id: checkSoon
+        interval: 50
+        onTriggered: check.running = true
+    }
 
     Component.onCompleted: {
         resolve()
