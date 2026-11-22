@@ -47,6 +47,9 @@ PanelWindow {
                 Behavior on opacity { NumberAnimation { duration: 400 } }
 
                 property bool shouldPlay: !wall.busy && !Gaming.active
+                onErrorOccurred: (error, errorString) => console.warn("wallpaper video:", wall.screen.name, errorString)
+                onPlaybackStateChanged: console.info("wallpaper video:", wall.screen.name, "state", playbackState, "source", source)
+                Component.onCompleted: console.info("wallpaper video: hasVideo", CurrentTheme.hasVideo, "busy", wall.busy)
                 onShouldPlayChanged: shouldPlay ? play() : pause()
             }
         }

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 dir="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
+# smooth animations at the monitor's refresh rate (Qt picks the 60 Hz "basic" loop on some GPUs, e.g. NVIDIA)
+export QSG_RENDER_LOOP="${QSG_RENDER_LOOP:-threaded}"
 [ -f "$dir/shell.qml" ] || dir="/usr/share/canvas"
 if [ -z "$CANVAS_EDITION" ]; then
     if [ -f "$HOME/.config/canvas/private.json" ]; then export CANVAS_EDITION=private; else export CANVAS_EDITION=community; fi
