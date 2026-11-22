@@ -150,7 +150,7 @@ FocusScope {
             }
             Txt {
                 anchors.verticalCenter: parent.verticalCenter
-                text: Lang.t.themesCurrent + CurrentTheme.name
+                text: Lang.t.themesCurrent + ((CurrentTheme.themes.find(t => t.name === CurrentTheme.name) || {}).title || CurrentTheme.name)
                 size: 13
                 color: Theme.subtext
             }
@@ -296,7 +296,7 @@ FocusScope {
                     color: card.modelData.color
                 }
                 Txt {
-                    text: card.modelData.name.charAt(0).toUpperCase() + card.modelData.name.slice(1)
+                    text: card.modelData.title && card.modelData.title !== card.modelData.name ? card.modelData.title : card.modelData.name.charAt(0).toUpperCase() + card.modelData.name.slice(1)
                     size: 16
                     weight: Font.DemiBold
                 }
