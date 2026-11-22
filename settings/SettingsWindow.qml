@@ -51,9 +51,17 @@ LazyLoader {
             width: 230
             color: Theme.surface
 
-            Column {
+            Flickable {
+                id: sideFlick
                 anchors.fill: parent
                 anchors.margins: 18
+                contentHeight: sideCol.implicitHeight
+                clip: true
+                boundsBehavior: Flickable.StopAtBounds
+
+            Column {
+                id: sideCol
+                width: sideFlick.width
                 spacing: 2
 
                 Row {
@@ -114,6 +122,7 @@ LazyLoader {
                         }
                     }
                 }
+            }
             }
         }
 
