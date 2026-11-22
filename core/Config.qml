@@ -107,6 +107,7 @@ Singleton {
             property bool lockNotifs: true
             property bool lockWeather: true
             property string dndSchedule: "off"
+            property bool themeCursor: true
         }
     }
 }

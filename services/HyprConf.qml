@@ -22,6 +22,8 @@ Singleton {
         l += ", touchpad = { tap_to_click = " + o.tapToClick + ", natural_scroll = " + o.naturalScroll + ", disable_while_typing = " + o.typingBlock + " } } })\n"
         // no Hyprland wallpaper/logo when Canvas is not running (e.g. during shutdown): theme color instead
         l += 'hl.config({ misc = { disable_hyprland_logo = true, disable_splash_rendering = true, force_default_wallpaper = 0, background_color = "rgb(' + String(Theme.base).replace("#", "").slice(-6) + ')" } })\n'
+        l += 'hl.env("XCURSOR_THEME", "' + Cursor.active + '")\n'
+        l += 'hl.env("XCURSOR_SIZE", "24")\n'
         // window borders follow the theme color
         const hex = c => String(c).replace("#", "").slice(-6)
         l += 'hl.config({ general = { col = { active_border = { colors = { "rgba(' + hex(Theme.accent) + 'ee)", "rgba(' + hex(Theme.accent2) + 'ee)" }, angle = 45 }, inactive_border = "rgba(' + hex(Theme.surface) + '88)" } } })\n'
@@ -84,5 +86,10 @@ Singleton {
         function onBaseChanged() { root.save() }
         function onAccentChanged() { root.save() }
         function onAccent2Changed() { root.save() }
+    }
+
+    Connections {
+        target: Cursor
+        function onActiveChanged() { root.save() }
     }
 }

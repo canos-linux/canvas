@@ -187,6 +187,11 @@ LazyLoader {
                         }
                     }
                     SettingRow {
+                        title: Lang.t.themeCursor
+                        sub: Lang.t.themeCursorSub
+                        Toggle { checked: Config.opt.themeCursor; onToggled: v => Config.opt.themeCursor = v }
+                    }
+                    SettingRow {
                         title: Lang.t.sounds
                         sub: Lang.t.soundsSub
                         Toggle { checked: Config.opt.sounds; onToggled: v => { Config.opt.sounds = v; Sounds.play("click") } }

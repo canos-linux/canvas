@@ -1,0 +1,78 @@
+#!/usr/bin/env python3
+# canvas-cursor <hex> - Bibata Modern cursor in the theme color -> ~/.local/share/icons/Canvas-Cursor-<hex>
+# black body becomes the theme color, the white outline stays; prints the theme name
+import os, sys, struct, shutil, glob
+
+SRC = "/usr/share/icons/Bibata-Modern-Classic/cursors"
+SIZES = {24, 32, 48, 64}
+hexc = sys.argv[1].lstrip("#")[-6:].lower()
+ar, ag, ab = (int(hexc[i:i + 2], 16) for i in (0, 2, 4))
+name = "Canvas-Cursor-" + hexc
+base = os.path.expanduser("~/.local/share/icons")
+dst = os.path.join(base, name)
+
+if not os.path.isdir(SRC):
+    sys.exit(1)
+if os.path.isfile(os.path.join(dst, "index.theme")):
+    print(name)
+    sys.exit(0)
+
+tmp = dst + ".tmp"
+shutil.rmtree(tmp, ignore_errors=True)
+os.makedirs(os.path.join(tmp, "cursors"))
+with open(os.path.join(tmp, "index.theme"), "w") as f:
+    f.write("[Icon Theme]\nName=%s\nComment=Canvas theme cursor\nInherits=Bibata-Modern-Classic\n" % name)
+
+lut = {}
+
+def recolor(px):
+    a = px >> 24
+    if a == 0:
+        return px
+    r, g, b = (px >> 16) & 255, (px >> 8) & 255, px & 255
+    # unpremultiply, lightness 0..1, mix theme color -> white
+    l = (r + g + b) / (3 * a)
+    nr, ng, nb = ar + (255 - ar) * l, ag + (255 - ag) * l, ab + (255 - ab) * l
+    return (a << 24) | (int(nr * a / 255) << 16) | (int(ng * a / 255) << 8) | int(nb * a / 255)
+
+for path in os.listdir(SRC):
+    s = os.path.join(SRC, path)
+    d = os.path.join(tmp, "cursors", path)
+    if os.path.islink(s):
+        os.symlink(os.readlink(s), d)
+        continue
+    data = open(s, "rb").read()
+    if data[:4] != b"Xcur":
+        shutil.copy(s, d)
+        continue
+    hsize, ver, ntoc = struct.unpack_from("<III", data, 4)
+    toc = [struct.unpack_from("<III", data, 16 + i * 12) for i in range(ntoc)]
+    imgs = [t for t in toc if t[0] == 0xFFFD0002]
+    keep = [t for t in imgs if t[1] in SIZES] or imgs
+    chunks = []
+    for typ, sub, pos in keep:
+        chsize, ctype, csub, cver, w, h, xh, yh, delay = struct.unpack_from("<IIIIIIIII", data, pos)
+        pix = struct.unpack_from("<%dI" % (w * h), data, pos + 36)
+        out = []
+        for p in pix:
+            q = lut.get(p)
+            if q is None:
+                q = lut[p] = recolor(p)
+            out.append(q)
+        chunks.append((sub, struct.pack("<IIIIIIIII", 36, ctype, csub, cver, w, h, xh, yh, delay) + struct.pack("<%dI" % len(out), *out)))
+    head = b"Xcur" + struct.pack("<III", 16, 0x10000, len(chunks))
+    pos = 16 + 12 * len(chunks)
+    tocb, body = b"", b""
+    for sub, c in chunks:
+        tocb += struct.pack("<III", 0xFFFD0002, sub, pos)
+        body += c
+        pos += len(c)
+    open(d, "wb").write(head + tocb + body)
+
+shutil.rmtree(dst, ignore_errors=True)
+os.rename(tmp, dst)
+# keep only the 4 newest generated cursors
+for old in sorted(glob.glob(os.path.join(base, "Canvas-Cursor-*")), key=os.path.getmtime)[:-4]:
+    if not old.endswith(hexc):
+        shutil.rmtree(old, ignore_errors=True)
+print(name)

@@ -23,6 +23,7 @@ ShellRoot {
     // singletons that must run from the start (login sound, KDE Connect daemon)
     readonly property bool soundsOn: Sounds.on
     readonly property bool phoneOn: Phone.installed
+    readonly property string cursorName: Cursor.active
 
     Variants {
         model: Quickshell.screens
