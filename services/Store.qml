@@ -69,7 +69,10 @@ Singleton {
     }
 
     function remove(app) {
-        if (busy !== "") return
+        if (busy !== "") {
+            queue = queue.concat([{ app: app, remove: true }])
+            return
+        }
         run(app, true)
     }
 

@@ -198,7 +198,7 @@ LazyLoader {
                                 spacing: 6
                                 Spinner { visible: appCard.working; anchors.verticalCenter: parent.verticalCenter }
                                 Icon {
-                                    visible: appCard.inst && !appCard.working
+                                    visible: appCard.inst && !appCard.working && !appCard.queued
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: "󰆴"
                                     size: 17
