@@ -48,8 +48,12 @@ PanelWindow {
 
                 property bool shouldPlay: !wall.busy && !Gaming.active
                 onErrorOccurred: (error, errorString) => console.warn("wallpaper video:", wall.screen.name, errorString)
-                onPlaybackStateChanged: console.info("wallpaper video:", wall.screen.name, "state", playbackState, "source", source)
-                Component.onCompleted: console.info("wallpaper video: hasVideo", CurrentTheme.hasVideo, "busy", wall.busy)
+                // new theme = new file: autoPlay only works on the first load
+                onSourceChanged: if (source != "" && shouldPlay) startLater.restart()
+                property Timer startLater: Timer {
+                    interval: 100
+                    onTriggered: if (video.shouldPlay) video.play()
+                }
                 onShouldPlayChanged: shouldPlay ? play() : pause()
             }
         }
