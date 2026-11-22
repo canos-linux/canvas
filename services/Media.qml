@@ -31,10 +31,18 @@ Singleton {
     property string art: player ? player.trackArtUrl : ""
     property var levels: [0, 0, 0, 0, 0, 0, 0, 0]
     property real position: 0
-    property real length: player && player.lengthSupported ? player.length : 0
+    // some players (Firefox) drop the length for a moment after seeking: keep the last known one for this track
+    readonly property real liveLength: player && player.lengthSupported && player.length > 0 ? player.length : 0
+    property real knownLength: 0
+    property string knownTrack: ""
+    onLiveLengthChanged: if (liveLength > 0) { knownLength = liveLength; knownTrack = title }
+    property real length: liveLength > 0 ? liveLength : (knownTrack === title ? knownLength : 0)
 
     function seek(fraction) {
-        if (player && player.canSeek && length > 0) player.position = fraction * length
+        if (player && player.canSeek && length > 0) {
+            player.position = fraction * length
+            position = fraction * length
+        }
     }
 
     Timer {
@@ -45,7 +53,7 @@ Singleton {
         onTriggered: {
             if (!root.player) return
             root.player.positionChanged()
-            root.position = root.player.positionSupported ? root.player.position : 0
+            if (root.player.positionSupported) root.position = root.player.position
         }
     }
 
