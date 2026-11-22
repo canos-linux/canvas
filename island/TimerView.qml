@@ -3,7 +3,7 @@ import "../core"
 import "../ui"
 
 Item {
-    readonly property int left: IslandState.timerLeft
+    readonly property int rest: IslandState.timerLeft
 
     Row {
         anchors.centerIn: parent
@@ -17,7 +17,7 @@ Item {
         }
         Txt {
             anchors.verticalCenter: parent.verticalCenter
-            text: (left >= 3600 ? Math.floor(left / 3600) + ":" + String(Math.floor(left % 3600 / 60)).padStart(2, "0") : Math.floor(left / 60)) + ":" + String(left % 60).padStart(2, "0")
+            text: (rest >= 3600 ? Math.floor(rest / 3600) + ":" + String(Math.floor(rest % 3600 / 60)).padStart(2, "0") : Math.floor(rest / 60)) + ":" + String(rest % 60).padStart(2, "0")
             size: 15
             weight: Font.DemiBold
             font.features: { "tnum": 1 }
