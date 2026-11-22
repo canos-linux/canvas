@@ -10,16 +10,22 @@ PanelWindow {
     property bool hovered: hover.hovered
     property bool focusedScreen: Hypr.focusedMonitor === "" || screen.name === Hypr.focusedMonitor
     property string overlay: focusedScreen ? IslandState.overlay : ""
-    property string mode: overlay !== "" ? overlay : expanded ? "center" : IslandState.temp !== "" ? IslandState.temp : Media.recent && Media.player ? "music" : "idle"
+    property string mode: overlay !== "" ? overlay : expanded ? "center" : IslandState.temp !== "" ? IslandState.temp : Recorder.active ? "rec" : IslandState.timerLeft > 0 ? "timer" : Media.recent && Media.player ? (hovered ? "musicbig" : "music") : "idle"
+    property bool hidden: Gaming.hidesIsland && (mode === "idle" || mode === "music" || mode === "timer" || mode === "game")
     property var sizes: ({
         idle: [hovered && Config.opt.hoverDate ? 250 : 130, 38],
         music: [400, 50],
+        musicbig: [440, 168],
+        rec: [230, 40],
+        timer: [220, 40],
+        game: [300, 44],
+        quick: [510, 72],
         volume: [310, 44],
         brightness: [310, 44],
         ws: [200, 38],
         notif: [370, 96],
         center: [500, IslandState.centerHeight],
-        launcher: [620, 66 + IslandState.launcherRows * 54 + (IslandState.launcherRows > 0 ? 14 : 0)],
+        launcher: [640, 66 + IslandState.launcherRows * 54 + (IslandState.launcherRows > 0 ? 8 : 0) + 52],
         themes: [960, 420],
         power: [480, 150],
         wifi: [480, IslandState.panelHeight],
@@ -39,7 +45,9 @@ PanelWindow {
     implicitHeight: Math.max(640, Math.min(900, screen.height - 60))
     exclusiveZone: 54
     color: "transparent"
-    mask: Region { item: island }
+    property Region islandRegion: Region { item: island }
+    property Region noRegion: Region {}
+    mask: hidden ? noRegion : islandRegion
     WlrLayershell.namespace: "canvas"
     WlrLayershell.keyboardFocus: overlay !== "" ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
@@ -70,7 +78,9 @@ PanelWindow {
         y: 8
         width: win.sizes[win.mode][0]
         height: win.sizes[win.mode][1]
-        radius: win.mode === "center" || win.mode === "themes" || win.mode === "power" || win.mode === "wifi" || win.mode === "bt" || win.mode === "audio" || win.mode === "polkit" ? 32 : win.mode === "launcher" ? 28 : height / 2
+        opacity: win.hidden ? 0 : 1
+        Behavior on opacity { NumberAnimation { duration: Theme.dur(250) } }
+        radius: win.mode === "musicbig" || win.mode === "center" || win.mode === "themes" || win.mode === "power" || win.mode === "wifi" || win.mode === "bt" || win.mode === "audio" || win.mode === "polkit" ? 32 : win.mode === "launcher" ? 28 : height / 2
         color: Theme.panel
         border.width: 1
         border.color: Theme.alpha(Theme.accent, win.mode === "idle" && !win.hovered ? 0.3 : 0.75)
@@ -86,11 +96,26 @@ PanelWindow {
         MouseArea {
             anchors.fill: parent
             enabled: !win.expanded && win.overlay === ""
-            onClicked: win.setExpanded(true)
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+            onClicked: mouse => {
+                if (mouse.button === Qt.RightButton) {
+                    IslandState.toggleOverlay("quick")
+                } else if (win.mode === "rec") {
+                    Recorder.stop()
+                } else {
+                    Sounds.play("open")
+                    win.setExpanded(true)
+                }
+            }
         }
 
         View { on: win.mode === "idle"; IdleView { anchors.fill: parent; hovered: win.hovered && Config.opt.hoverDate } }
         View { on: win.mode === "music"; MusicView { anchors.fill: parent } }
+        View { on: win.mode === "musicbig"; MusicBigView { anchors.fill: parent } }
+        View { on: win.mode === "rec"; RecView { anchors.fill: parent } }
+        View { on: win.mode === "timer"; TimerView { anchors.fill: parent } }
+        View { on: win.mode === "game"; GameView { anchors.fill: parent } }
+        View { on: win.mode === "quick"; QuickView { anchors.fill: parent; win: win } }
         View { on: win.mode === "volume"; VolumeView { anchors.fill: parent } }
         View { on: win.mode === "brightness"; BrightnessView { anchors.fill: parent } }
         View { on: win.mode === "ws"; WsView { anchors.fill: parent } }

@@ -12,11 +12,16 @@ import "lock"
 import "shot"
 import "welcome"
 import "overlay"
+import "overview"
+import "widgets"
 
 ShellRoot {
     readonly property bool hyprConfReady: HyprConf.ready
     // first start with several displays, main display focus
     readonly property bool displaysReady: Displays.ready
+    // singletons that must run from the start (login sound, KDE Connect daemon)
+    readonly property bool soundsOn: Sounds.on
+    readonly property bool phoneOn: Phone.installed
 
     Variants {
         model: Quickshell.screens
@@ -24,11 +29,13 @@ ShellRoot {
             id: screenScope
             required property var modelData
             Wallpaper { screen: screenScope.modelData }
+            Desktop { screen: screenScope.modelData }
             Catcher { screen: screenScope.modelData }
             Island { screen: screenScope.modelData }
             RegionShot { screen: screenScope.modelData }
             Identify { screen: screenScope.modelData }
             PowerFade { screen: screenScope.modelData }
+            Overview { screen: screenScope.modelData }
         }
     }
 
@@ -135,6 +142,26 @@ ShellRoot {
         }
         function identify(): void {
             Displays.identify()
+        }
+        function overview(): void {
+            IslandState.overlay = ""
+            IslandState.expandedScreen = ""
+            IslandState.overview = !IslandState.overview
+        }
+        function record(): void {
+            Recorder.toggle(false)
+        }
+        function recordregion(): void {
+            Recorder.toggle(true)
+        }
+        function gaming(): void {
+            Gaming.toggle()
+        }
+        function timer(seconds: int): void {
+            IslandState.startTimer(seconds)
+        }
+        function quick(): void {
+            IslandState.toggleOverlay("quick")
         }
         function lockpreview(): void {
             IslandState.lockPreview = true

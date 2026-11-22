@@ -1,5 +1,6 @@
 import QtQuick
 import "../core"
+import "../services"
 import "../ui"
 
 Rectangle {
@@ -34,6 +35,6 @@ Rectangle {
         anchors.fill: parent
         hoverEnabled: true
         enabled: !btn.busy
-        onClicked: btn.clicked()
+        onClicked: { Sounds.play("click"); btn.clicked() }
     }
 }

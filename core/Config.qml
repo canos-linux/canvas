@@ -79,6 +79,27 @@ Singleton {
             property string displays: ""
             property bool displaySetup: false
             property bool termCopyPaste: false
+            property bool sounds: true
+            property real soundVolume: 0.35
+            property bool widgets: true
+            property string widgetSide: "right"
+            property bool wClock: true
+            property bool wWeather: true
+            property string weatherCity: ""
+            property bool wSystem: false
+            property bool wCalendar: false
+            property bool wMusic: true
+            property string musicStyle: "vinyl"
+            property bool wVisualizer: true
+            property bool wLyrics: true
+            property bool recordAudio: true
+            property bool gameAuto: true
+            property bool gameDnd: true
+            property bool gameHideIsland: false
+            property bool gamePerformance: true
+            property bool gameNoAnim: true
+            property bool gameMuteSounds: true
+            property bool phone: false
         }
     }
 }

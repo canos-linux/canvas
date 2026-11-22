@@ -22,6 +22,13 @@ Singleton {
         l += ", touchpad = { tap_to_click = " + o.tapToClick + ", natural_scroll = " + o.naturalScroll + ", disable_while_typing = " + o.typingBlock + " } } })\n"
         // no Hyprland wallpaper/logo when Canvas is not running (e.g. during shutdown): theme color instead
         l += 'hl.config({ misc = { disable_hyprland_logo = true, disable_splash_rendering = true, force_default_wallpaper = 0, background_color = "rgb(' + String(Theme.base).replace("#", "").slice(-6) + ')" } })\n'
+        // guard: hyprctl eval runs this again in the same Lua state -> no double binds
+        l += 'if not _G.canvasBinds then\n  _G.canvasBinds = true\n'
+        l += '  hl.bind("SUPER + TAB", hl.dsp.exec_cmd("canvas overview"))\n'
+        l += '  hl.bind("SUPER + SHIFT + R", hl.dsp.exec_cmd("canvas recordregion"))\n'
+        l += '  hl.bind("SUPER + ALT + R", hl.dsp.exec_cmd("canvas record"))\n'
+        l += '  hl.bind("SUPER + G", hl.dsp.exec_cmd("canvas gaming"))\n'
+        l += 'end\n'
         for (const t of touchpads) l += 'hl.device({ name = "' + t + '", sensitivity = ' + o.touchpadSpeed.toFixed(2) + " })\n"
         return l
     }

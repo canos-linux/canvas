@@ -30,6 +30,24 @@ Singleton {
     property string artist: player ? player.trackArtist : ""
     property string art: player ? player.trackArtUrl : ""
     property var levels: [0, 0, 0, 0, 0, 0, 0, 0]
+    property real position: 0
+    property real length: player && player.lengthSupported ? player.length : 0
+
+    function seek(fraction) {
+        if (player && player.canSeek && length > 0) player.position = fraction * length
+    }
+
+    Timer {
+        interval: 400
+        repeat: true
+        running: root.playing
+        triggeredOnStart: true
+        onTriggered: {
+            if (!root.player) return
+            root.player.positionChanged()
+            root.position = root.player.positionSupported ? root.player.position : 0
+        }
+    }
 
     function toggle() { if (player) player.togglePlaying() }
     function next() { if (player) player.next() }

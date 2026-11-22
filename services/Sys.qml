@@ -9,6 +9,7 @@ Singleton {
     property real ram: 0
     property real temp: 0
     property bool active: false
+    property bool widget: false
     property var last: [0, 0]
 
     Process {
@@ -34,8 +35,8 @@ Singleton {
     }
 
     Timer {
-        interval: 1500
-        running: root.active
+        interval: root.active ? 1500 : 3000
+        running: root.active || root.widget
         repeat: true
         triggeredOnStart: true
         onTriggered: query.running = true

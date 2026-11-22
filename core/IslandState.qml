@@ -26,6 +26,38 @@ Singleton {
     property string btPopIcon: ""
     property real btPopBattery: -1
     property string powerAction: ""
+    property bool overview: false
+    property int timerLeft: 0
+    property int timerTotal: 0
+
+    function startTimer(sec) {
+        timerTotal = sec
+        timerLeft = sec
+        countdown.restart()
+        Sounds.play("open")
+    }
+
+    function stopTimer() {
+        countdown.stop()
+        timerLeft = 0
+    }
+
+    Timer {
+        id: countdown
+        interval: 1000
+        repeat: true
+        onTriggered: {
+            root.timerLeft--
+            if (root.timerLeft <= 0) {
+                stop()
+                root.timerLeft = 0
+                Sounds.play("notif")
+                root.notify("Canvas", Lang.t.timerDone, "")
+            }
+        }
+    }
+
+    onOverlayChanged: Sounds.play(overlay !== "" ? "open" : "close")
 
     // shutdown / restart / logout: Canvas fades out first, then the system takes over (Plymouth)
     function power(action) {
@@ -33,6 +65,7 @@ Singleton {
         closeAll()
         settingsOpen = false
         powerAction = action
+        Sounds.play("shutdown")
         powerTimer.restart()
     }
 
@@ -76,7 +109,8 @@ Singleton {
     }
 
     function show(e) {
-        if (Config.opt.dnd && !e.urgent) return
+        if ((Config.opt.dnd || Gaming.blocksNotifs) && !e.urgent) return
+        Sounds.play("notif")
         notifEntry = e
         notifApp = e.app
         notifTitle = e.title
@@ -87,6 +121,7 @@ Singleton {
     function closeAll() {
         overlay = ""
         expandedScreen = ""
+        overview = false
     }
 
     function openClipboard() {
@@ -97,6 +132,7 @@ Singleton {
 
     function startShot() {
         closeAll()
+        Sounds.play("shot")
         shotTimer.restart()
     }
 
@@ -172,6 +208,20 @@ Singleton {
             root.btPopIcon = Bt.glyph(d)
             root.btPopBattery = d.batteryAvailable ? d.battery : -1
             if (root.temp !== "notif") root.flash("btdev", 3200)
+        }
+    }
+
+    Connections {
+        target: Recorder
+        function onFinished(path) {
+            root.notify("Canvas", Lang.t.recSaved, path.replace(Quickshell.env("HOME"), "~"))
+        }
+    }
+
+    Connections {
+        target: Gaming
+        function onActiveChanged() {
+            root.flash("game", 2200)
         }
     }
 

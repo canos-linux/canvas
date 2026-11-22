@@ -1,5 +1,6 @@
 import QtQuick
 import "../core"
+import "../services"
 
 Item {
     id: btn
@@ -47,5 +48,5 @@ Item {
     }
 
     HoverHandler { id: hov }
-    TapHandler { id: tap; gesturePolicy: TapHandler.ReleaseWithinBounds; onTapped: btn.clicked() }
+    TapHandler { id: tap; gesturePolicy: TapHandler.ReleaseWithinBounds; onTapped: { Sounds.play("click"); btn.clicked() } }
 }

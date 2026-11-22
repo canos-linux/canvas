@@ -1,5 +1,6 @@
 import QtQuick
 import "../core"
+import "../services"
 
 Rectangle {
     id: tile
@@ -17,7 +18,7 @@ Rectangle {
     Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutBack } }
 
     HoverHandler { id: hov }
-    TapHandler { id: tap; gesturePolicy: TapHandler.ReleaseWithinBounds; onTapped: tile.clicked() }
+    TapHandler { id: tap; gesturePolicy: TapHandler.ReleaseWithinBounds; onTapped: { Sounds.play("click"); tile.clicked() } }
 
     Row {
         anchors.left: parent.left

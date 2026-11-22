@@ -1,5 +1,6 @@
 import QtQuick
 import "../core"
+import "../services"
 
 Rectangle {
     id: seg
@@ -40,7 +41,7 @@ Rectangle {
                 }
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: seg.picked(seg.values[index])
+                    onClicked: { Sounds.play("click"); seg.picked(seg.values[index]) }
                 }
             }
         }

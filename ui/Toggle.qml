@@ -1,5 +1,6 @@
 import QtQuick
 import "../core"
+import "../services"
 
 Rectangle {
     id: toggle
@@ -26,6 +27,6 @@ Rectangle {
     MouseArea {
         id: area
         anchors.fill: parent
-        onClicked: toggle.toggled(!toggle.checked)
+        onClicked: { Sounds.play("click"); toggle.toggled(!toggle.checked) }
     }
 }

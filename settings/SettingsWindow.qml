@@ -20,6 +20,9 @@ LazyLoader {
             { key: "look", icon: "󰏘", name: Lang.t.pageLook },
             { key: "island", icon: "󱂬", name: Lang.t.pageIsland },
             { key: "center", icon: "󰕮", name: Lang.t.pageCenter },
+            { key: "widgets", icon: "󰖲", name: Lang.t.pageWidgets },
+            { key: "gaming", icon: "󰊴", name: Lang.t.pageGaming },
+            { key: "phone", icon: "󰄜", name: Lang.t.pagePhone },
             { key: "parts", icon: "󰒓", name: Lang.t.pageParts, priv: true },
             { key: "display", icon: "󰍹", name: Lang.t.pageDisplay },
             { key: "input", icon: "󰌌", name: Lang.t.pageInput },
@@ -172,6 +175,23 @@ LazyLoader {
                             onPicked: v => Config.opt.animations = v
                         }
                     }
+                    SettingRow {
+                        title: Lang.t.sounds
+                        sub: Lang.t.soundsSub
+                        Toggle { checked: Config.opt.sounds; onToggled: v => { Config.opt.sounds = v; Sounds.play("click") } }
+                    }
+                    SettingRow {
+                        title: Lang.t.soundVolume
+                        opacity: Config.opt.sounds ? 1 : 0.4
+                        Slider {
+                            width: 200
+                            value: Config.opt.soundVolume
+                            onMoved: v => {
+                                Config.opt.soundVolume = Math.round(v * 100) / 100
+                                Sounds.play("click")
+                            }
+                        }
+                    }
                 }
 
                 Column {
@@ -206,6 +226,11 @@ LazyLoader {
                         title: Lang.t.dnd
                         sub: Lang.t.dndSub
                         Toggle { checked: Config.opt.dnd; onToggled: v => Config.opt.dnd = v }
+                    }
+                    SettingRow {
+                        title: Lang.t.recordAudio
+                        sub: Lang.t.recordAudioSub
+                        Toggle { checked: Config.opt.recordAudio; onToggled: v => Config.opt.recordAudio = v }
                     }
                 }
 
@@ -377,6 +402,9 @@ LazyLoader {
                 }
 
                 DisplayPage { visible: win.page === "display" }
+                WidgetsPage { visible: win.page === "widgets" }
+                GamingPage { visible: win.page === "gaming" }
+                PhonePage { visible: win.page === "phone" }
                 InputPage { visible: win.page === "input" }
                 AppsPage { visible: win.page === "apps" }
                 AccountPage { visible: win.page === "account" }
