@@ -41,6 +41,7 @@ Singleton {
     }
 
     function openEmoji() {
+        if (overlay === "clip" && clipTab === "emoji") { overlay = ""; return }
         clipTab = "emoji"
         if (overlay === "clip") overlay = ""
         overlay = "clip"
@@ -143,6 +144,7 @@ Singleton {
     }
 
     function openClipboard() {
+        if (overlay === "clip" && clipTab === "clip") { overlay = ""; return }
         clipTab = "clip"
         if (overlay === "clip") overlay = ""
         overlay = "clip"
