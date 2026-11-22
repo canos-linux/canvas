@@ -25,8 +25,9 @@ ShellRoot {
     readonly property bool phoneOn: Phone.installed
     readonly property string cursorName: Cursor.active
 
+    // main display first: Qt paces animations by the first windows -> 240 Hz main monitor is not held back by a 60 Hz one
     Variants {
-        model: Quickshell.screens
+        model: Quickshell.screens.slice().sort((a, b) => (b.name === Displays.mainName) - (a.name === Displays.mainName))
         Scope {
             id: screenScope
             required property var modelData
