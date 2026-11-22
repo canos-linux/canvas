@@ -28,6 +28,7 @@ Singleton {
     property string powerAction: ""
     property bool overview: false
     property string clipTab: "clip"
+    property string shotMode: "shot"   // region picker: screenshot or screen recording
 
     // Do not disturb by schedule: night 22–7, school Mon–Fri 8–16
     function dndScheduled() {
@@ -152,6 +153,7 @@ Singleton {
 
     function startShot() {
         closeAll()
+        shotMode = "shot"
         Sounds.play("shot")
         shotTimer.restart()
     }
@@ -160,6 +162,13 @@ Singleton {
         id: shotTimer
         interval: 300
         onTriggered: root.shooting = true
+    }
+
+    // area recording: Canvas' own region picker (slurp did not show up on some NVIDIA setups)
+    function startRecordRegion() {
+        closeAll()
+        shotMode = "record"
+        shotTimer.restart()
     }
 
     function toggleOverlay(name) {

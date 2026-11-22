@@ -3,6 +3,7 @@ import Quickshell.Wayland
 import QtQuick
 import "../core"
 import "../ui"
+import "../services"
 
 PanelWindow {
     id: shot
@@ -46,7 +47,12 @@ PanelWindow {
         const g = full
             ? Math.round(screen.x) + "," + Math.round(screen.y) + " " + screen.width + "x" + screen.height
             : Math.round(screen.x + sx) + "," + Math.round(screen.y + sy) + " " + Math.round(sw) + "x" + Math.round(sh)
+        const mode = IslandState.shotMode
         IslandState.shooting = false
+        if (mode === "record") {
+            Recorder.startGeometry(g)
+            return
+        }
         Quickshell.execDetached(["sh", "-c", "sleep 0.25; d=\"$(xdg-user-dir PICTURES 2>/dev/null || echo \"$HOME/Pictures\")/Screenshots\"; mkdir -p \"$d\"; f=\"$d/$(date +%Y-%m-%d_%H-%M-%S).png\"; grim -g \"$1\" \"$f\" && wl-copy < \"$f\" && notify-send -i \"$f\" \"$2\" \"$3\"", "sh", g, Lang.t.shotTitle, Lang.t.shotBody])
     }
 

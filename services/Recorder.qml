@@ -14,17 +14,26 @@ Singleton {
 
     function start(region) {
         if (proc.running) return
+        if (region) {
+            IslandState.startRecordRegion()
+            return
+        }
+        startGeometry("")
+    }
+
+    function startGeometry(geom) {
+        if (proc.running) return
         file = ""
         seconds = 0
         proc.command = ["sh", "-c", `
 dir="$HOME/Videos/Recordings"; mkdir -p "$dir"
 f="$dir/Recording_$(date +%Y-%m-%d_%H-%M-%S).mp4"
 set -- -f "$f" -c libx264 -p preset=veryfast -p crf=23
-if [ "$REGION" = 1 ]; then g=$(slurp -d) || exit 3; set -- "$@" -g "$g"; else set -- "$@" -o "$MON"; fi
+if [ -n "$GEOM" ]; then set -- "$@" -g "$GEOM"; else set -- "$@" -o "$MON"; fi
 if [ "$AUDIO" = 1 ]; then s=$(pactl get-default-sink 2>/dev/null); [ -n "$s" ] && set -- "$@" --audio="$s.monitor"; fi
 echo "FILE:$f"
 exec wf-recorder "$@"`]
-        proc.environment = { REGION: region ? "1" : "0", AUDIO: Config.opt.recordAudio ? "1" : "0", MON: Hypr.focusedMonitor }
+        proc.environment = { GEOM: geom, AUDIO: Config.opt.recordAudio ? "1" : "0", MON: Hypr.focusedMonitor }
         proc.running = true
     }
 
