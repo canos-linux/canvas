@@ -24,6 +24,7 @@ LazyLoader {
             { key: "widgets", icon: "󰖲", name: Lang.t.pageWidgets },
             { key: "gaming", icon: "󰊴", name: Lang.t.pageGaming },
             { key: "phone", icon: "󰄜", name: Lang.t.pagePhone },
+            { key: "recovery", icon: "󰁯", name: Lang.t.pageRecovery, community: true },
             { key: "parts", icon: "󰒓", name: Lang.t.pageParts, priv: true },
             { key: "display", icon: "󰍹", name: Lang.t.pageDisplay },
             { key: "input", icon: "󰌌", name: Lang.t.pageInput },
@@ -229,6 +230,29 @@ LazyLoader {
                         Toggle { checked: Config.opt.dnd; onToggled: v => Config.opt.dnd = v }
                     }
                     SettingRow {
+                        title: Lang.t.dndSchedule
+                        sub: Lang.t.dndScheduleSub
+                        Segmented {
+                            options: [Lang.t.off, Lang.t.dndNight, Lang.t.dndSchool, Lang.t.dndBoth]
+                            values: ["off", "night", "school", "both"]
+                            value: Config.opt.dndSchedule
+                            onPicked: v => Config.opt.dndSchedule = v
+                        }
+                    }
+                    SettingRow {
+                        title: Lang.t.lockMusic
+                        Toggle { checked: Config.opt.lockMusic; onToggled: v => Config.opt.lockMusic = v }
+                    }
+                    SettingRow {
+                        title: Lang.t.lockNotifs
+                        sub: Lang.t.lockNotifsSub
+                        Toggle { checked: Config.opt.lockNotifs; onToggled: v => Config.opt.lockNotifs = v }
+                    }
+                    SettingRow {
+                        title: Lang.t.lockWeather
+                        Toggle { checked: Config.opt.lockWeather; onToggled: v => Config.opt.lockWeather = v }
+                    }
+                    SettingRow {
                         title: Lang.t.recordAudio
                         sub: Lang.t.recordAudioSub
                         Toggle { checked: Config.opt.recordAudio; onToggled: v => Config.opt.recordAudio = v }
@@ -405,6 +429,7 @@ LazyLoader {
                 DisplayPage { visible: win.page === "display" }
                 WidgetsPage { visible: win.page === "widgets" }
                 ThemesPage { visible: win.page === "themes" }
+                RecoveryPage { visible: win.page === "recovery" }
                 GamingPage { visible: win.page === "gaming" }
                 PhonePage { visible: win.page === "phone" }
                 InputPage { visible: win.page === "input" }

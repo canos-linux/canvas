@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Canvas Settings
+Name[de]=Canvas Einstellungen
+Comment=Themes, widgets, displays and more
+Comment[de]=Themes, Widgets, Bildschirme und mehr
+Exec=canvas settings
+Icon=preferences-system
+Categories=Settings;
+Keywords=settings;einstellungen;themes;widgets;

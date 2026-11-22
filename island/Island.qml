@@ -20,6 +20,7 @@ PanelWindow {
         timer: [220, 40],
         game: [300, 44],
         quick: [510, 72],
+        clip: [660, 480],
         volume: [310, 44],
         brightness: [310, 44],
         ws: [200, 38],
@@ -80,7 +81,7 @@ PanelWindow {
         height: win.sizes[win.mode][1]
         opacity: win.hidden ? 0 : 1
         Behavior on opacity { NumberAnimation { duration: Theme.dur(250) } }
-        radius: win.mode === "musicbig" || win.mode === "center" || win.mode === "themes" || win.mode === "power" || win.mode === "wifi" || win.mode === "bt" || win.mode === "audio" || win.mode === "polkit" ? 32 : win.mode === "launcher" ? 28 : height / 2
+        radius: win.mode === "clip" || win.mode === "musicbig" || win.mode === "center" || win.mode === "themes" || win.mode === "power" || win.mode === "wifi" || win.mode === "bt" || win.mode === "audio" || win.mode === "polkit" ? 32 : win.mode === "launcher" ? 28 : height / 2
         color: Theme.panel
         border.width: 1
         border.color: Theme.alpha(Theme.accent, win.mode === "idle" && !win.hovered ? 0.3 : 0.75)
@@ -116,6 +117,7 @@ PanelWindow {
         View { on: win.mode === "timer"; TimerView { anchors.fill: parent } }
         View { on: win.mode === "game"; GameView { anchors.fill: parent } }
         View { on: win.mode === "quick"; QuickView { anchors.fill: parent; win: win } }
+        View { on: win.mode === "clip"; ClipView { anchors.fill: parent; active: win.mode === "clip" } }
         View { on: win.mode === "volume"; VolumeView { anchors.fill: parent } }
         View { on: win.mode === "brightness"; BrightnessView { anchors.fill: parent } }
         View { on: win.mode === "ws"; WsView { anchors.fill: parent } }

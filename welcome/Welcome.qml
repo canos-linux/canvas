@@ -19,7 +19,24 @@ LazyLoader {
         // display step only with more than one display
         readonly property int d: multi ? 1 : 0
         readonly property bool multi: Displays.count > 1
-        readonly property int steps: 4 + d
+        readonly property int steps: (live ? 4 : 6) + d
+        property var picked: ({ steam: true, discord: true, spotify: true })
+        property bool wantSnapshots: true
+
+        function setupSystem() {
+            if (live) return
+            const apps = Store.catalog.filter(a => picked[a.id])
+            const extra = Config.opt.phone ? ["kdeconnect"] : []
+            Store.installMany(apps, extra)
+            if (wantSnapshots) snapLater.start()
+        }
+
+        Timer {
+            id: snapLater
+            interval: 1500
+            repeat: true
+            onTriggered: if (Store.busy === "") { stop(); Snapshots.setup() }
+        }
         readonly property bool live: Quickshell.env("USER") === "liveuser"
         property bool displaysOn: false
         readonly property var kbOptions: [
@@ -51,6 +68,7 @@ LazyLoader {
         function finish() {
             if (multi && !displaysOn && Displays.firstStart) Displays.enableAll()
             Config.opt.displaySetup = true
+            if (!Config.opt.welcomeDone) setupSystem()
             Config.opt.welcomeDone = true
             IslandState.welcomeOpen = false
         }
@@ -281,7 +299,7 @@ LazyLoader {
                                         color: card.modelData.color
                                     }
                                     Txt {
-                                        text: card.modelData.name.charAt(0).toUpperCase() + card.modelData.name.slice(1)
+                                        text: card.modelData.title && card.modelData.title !== card.modelData.name ? card.modelData.title : card.modelData.name.charAt(0).toUpperCase() + card.modelData.name.slice(1)
                                         weight: card.current ? Font.DemiBold : Font.Normal
                                     }
                                 }
@@ -345,6 +363,110 @@ LazyLoader {
 
             Page {
                 index: 3 + win.d
+                visible: !win.live && opacity > 0
+                Column {
+                    anchors.fill: parent
+                    spacing: 6
+                    Txt { text: Lang.t.welcomeApps; size: 26; weight: Font.Bold }
+                    Txt { text: Lang.t.welcomeAppsSub; size: 14; color: Theme.subtext; bottomPadding: 14 }
+                    Grid {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        columns: 4
+                        spacing: 10
+                        Repeater {
+                            model: Store.catalog.filter(a => ["steam", "discord", "spotify", "sober", "obs", "vscode", "libreoffice", "vlc", "gimp", "heroic", "prism", "telegram"].indexOf(a.id) !== -1)
+                            Rectangle {
+                                id: appTile
+                                required property var modelData
+                                readonly property bool on: win.picked[modelData.id] === true
+                                width: 150
+                                height: 58
+                                radius: 18
+                                color: on ? Theme.alpha(Theme.accent, 0.22) : tileHov.hovered ? Theme.surfaceHigh : Theme.surface
+                                border.width: on ? 1 : 0
+                                border.color: Theme.accent
+                                Icon {
+                                    id: chk
+                                    anchors.left: parent.left
+                                    anchors.leftMargin: 14
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text: appTile.on ? "󰄲" : "󰄱"
+                                    size: 20
+                                    color: appTile.on ? Theme.accent : Theme.subtext
+                                    hoverable: false
+                                }
+                                Txt {
+                                    anchors.left: chk.right
+                                    anchors.leftMargin: 10
+                                    anchors.right: parent.right
+                                    anchors.rightMargin: 8
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    text: appTile.modelData.name
+                                    weight: Font.DemiBold
+                                    elide: Text.ElideRight
+                                }
+                                HoverHandler { id: tileHov }
+                                TapHandler {
+                                    onTapped: {
+                                        Sounds.play("click")
+                                        const p = Object.assign({}, win.picked)
+                                        p[appTile.modelData.id] = !appTile.on
+                                        win.picked = p
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    Txt { topPadding: 12; text: Lang.t.welcomeAppsMore; size: 12; color: Theme.subtext }
+                }
+            }
+
+            Page {
+                index: 4 + win.d
+                visible: !win.live && opacity > 0
+                Column {
+                    anchors.fill: parent
+                    spacing: 4
+                    Txt { text: Lang.t.welcomeExtras; size: 26; weight: Font.Bold; bottomPadding: 14 }
+                    Repeater {
+                        model: [
+                            { icon: "󰕾", title: Lang.t.sounds, sub: Lang.t.soundsSub, key: "sounds" },
+                            { icon: "󰖲", title: Lang.t.widgetsOn, sub: Lang.t.widgetsOnSub, key: "widgets" },
+                            { icon: "󰄜", title: Lang.t.phoneOn, sub: Lang.t.phoneOnSub, key: "phone" },
+                            { icon: "󰆓", title: Lang.t.snapTitle, sub: Lang.t.snapWelcomeSub, key: "snap" }
+                        ]
+                        Item {
+                            required property var modelData
+                            readonly property bool on: modelData.key === "snap" ? win.wantSnapshots : Config.opt[modelData.key]
+                            width: parent.width
+                            height: 62
+                            Icon { id: exIcon; anchors.verticalCenter: parent.verticalCenter; text: modelData.icon; size: 22; color: Theme.accent; hoverable: false }
+                            Column {
+                                anchors.left: exIcon.right
+                                anchors.leftMargin: 16
+                                anchors.right: exToggle.left
+                                anchors.rightMargin: 16
+                                anchors.verticalCenter: parent.verticalCenter
+                                Txt { text: modelData.title; size: 15; weight: Font.DemiBold }
+                                Txt { width: parent.width; text: modelData.sub; size: 12; color: Theme.subtext; wrapMode: Text.WordWrap }
+                            }
+                            Toggle {
+                                id: exToggle
+                                anchors.right: parent.right
+                                anchors.verticalCenter: parent.verticalCenter
+                                checked: parent.on
+                                onToggled: v => {
+                                    if (modelData.key === "snap") win.wantSnapshots = v
+                                    else Config.opt[modelData.key] = v
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            Page {
+                index: win.steps - 1
                 Column {
                     anchors.centerIn: parent
                     spacing: 16

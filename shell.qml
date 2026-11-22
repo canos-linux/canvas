@@ -14,6 +14,7 @@ import "welcome"
 import "overlay"
 import "overview"
 import "widgets"
+import "store"
 
 ShellRoot {
     readonly property bool hyprConfReady: HyprConf.ready
@@ -43,6 +44,7 @@ ShellRoot {
     }
 
     SettingsWindow {}
+    StoreWindow {}
     Lock {}
     Welcome {}
 
@@ -162,6 +164,15 @@ ShellRoot {
         }
         function timer(seconds: int): void {
             IslandState.startTimer(seconds)
+        }
+        function store(): void {
+            Store.open = true
+        }
+        function emoji(): void {
+            IslandState.openEmoji()
+        }
+        function importtheme(path: string): void {
+            CurrentTheme.importFile(path)
         }
         function quick(): void {
             IslandState.toggleOverlay("quick")

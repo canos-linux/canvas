@@ -40,6 +40,56 @@ Singleton {
         }
     }
 
+    // share: one file (tar.gz) "<name>.canostheme" in Downloads
+    signal shared(string path)
+    signal imported(bool ok)
+
+    function exportTheme(t) {
+        exporter.command = ["sh", "-c", "mkdir -p \"$HOME/Downloads\"; f=\"$HOME/Downloads/$2.canostheme\"; tar czf \"$f\" -C \"$(dirname \"$1\")\" \"$(basename \"$1\")\" && echo \"$f\"", "sh", t.dir, t.name]
+        exporter.running = true
+    }
+
+    function importFile(path) {
+        importer.command = ["sh", "-c", `
+t=$(mktemp -d) || exit 1
+tar xzf "$1" -C "$t" 2>/dev/null || { rm -rf "$t"; exit 1; }
+src=$(dirname "$(find "$t" -maxdepth 2 -name theme.json | head -1)")
+[ -f "$src/theme.json" ] && [ -f "$src/lock.png" ] || { rm -rf "$t"; exit 1; }
+n=$(basename "$src"); [ "$src" = "$t" ] && n=$(basename "$1" .canostheme)
+n=$(printf '%s' "$n" | tr -cs 'a-zA-Z0-9-' '-' | sed 's/^-*//; s/-*$//'); [ -n "$n" ] || n=theme
+mkdir -p "$2"; b=$n; i=2; while [ -e "$2/$n" ] || [ -e "$3/$n" ]; do n="$b-$i"; i=$((i+1)); done; d="$2/$n"
+mkdir -p "$d" && cp -r "$src"/. "$d"/ && find "$d" -type f ! -name '*.png' ! -name '*.jpg' ! -name '*.mp4' ! -name '*.json' -delete
+rm -rf "$t"; echo "$n"`, "sh", path, userRoot, Quickshell.shellDir + "/themes"]
+        importer.running = true
+    }
+
+    Process {
+        id: exporter
+        stdout: StdioCollector { onStreamFinished: if (text.trim() !== "") root.shared(text.trim()) }
+    }
+
+    Process {
+        id: importer
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const n = text.trim()
+                root.imported(n !== "")
+                if (n !== "") {
+                    importedName = n
+                    root.refresh()
+                    applyImported.restart()
+                }
+            }
+        }
+    }
+
+    property string importedName: ""
+    Timer {
+        id: applyImported
+        interval: 600
+        onTriggered: root.apply(root.themes.find(t => t.name === root.importedName))
+    }
+
     function restoreBuiltIn() {
         Config.opt.hiddenThemes = ""
     }

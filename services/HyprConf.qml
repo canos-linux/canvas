@@ -31,6 +31,7 @@ Singleton {
         + 'hl.bind("SUPER + SHIFT + R", hl.dsp.exec_cmd("canvas recordregion"))\n'
         + 'hl.bind("SUPER + ALT + R", hl.dsp.exec_cmd("canvas record"))\n'
         + 'hl.bind("SUPER + G", hl.dsp.exec_cmd("canvas gaming"))\n'
+        + 'hl.bind("SUPER + PERIOD", hl.dsp.exec_cmd("canvas emoji"))\n'
 
     Process {
         running: true

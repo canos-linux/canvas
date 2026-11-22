@@ -18,6 +18,23 @@ Column {
     property string pick: ""
     property string newColor: ""
     property string busyText: ""
+    property bool importing: false
+    property var shareFiles: []
+
+    Connections {
+        target: CurrentTheme
+        function onShared(path) { IslandState.notify("Canvas", Lang.t.themeShared, path.replace(Quickshell.env("HOME"), "~")) }
+        function onImported(ok) {
+            page.importing = false
+            if (!ok) IslandState.notify("Canvas", Lang.t.themeImportFailed, "")
+        }
+    }
+
+    Process {
+        id: shareFinder
+        command: ["sh", "-c", "find \"$HOME/Downloads\" \"$HOME/Desktop\" \"$HOME\" -maxdepth 2 -name '*.canostheme' 2>/dev/null | sort -u | head -20"]
+        stdout: StdioCollector { onStreamFinished: page.shareFiles = text.split("\n").filter(l => l !== "") }
+    }
 
     onVisibleChanged: if (visible) CurrentTheme.refresh()
 
@@ -107,11 +124,60 @@ echo OK`, "sh", CurrentTheme.userRoot, s, pick, title.replace(/"/g, "'"), newCol
             color: Theme.accent
         }
         PillButton {
+            anchors.right: newBtn.left
+            anchors.rightMargin: 8
+            anchors.verticalCenter: parent.verticalCenter
+            text: Lang.t.themeImport
+            onClicked: {
+                page.importing = !page.importing
+                if (page.importing) shareFinder.running = true
+            }
+        }
+        PillButton {
+            id: newBtn
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
             text: "+  " + Lang.t.themeNew
             primary: true
             onClicked: page.startCreate()
+        }
+    }
+
+    Column {
+        visible: page.importing && !page.creating
+        width: parent.width
+        spacing: 6
+        bottomPadding: 10
+        Txt {
+            width: parent.width
+            text: page.shareFiles.length === 0 ? Lang.t.themeImportNone : Lang.t.themeImportPick
+            size: 12
+            color: Theme.subtext
+            wrapMode: Text.WordWrap
+        }
+        Repeater {
+            model: page.shareFiles
+            Rectangle {
+                width: page.width
+                height: 44
+                radius: 14
+                color: impHov.hovered ? Theme.surfaceHigh : Theme.surface
+                Row {
+                    anchors.left: parent.left
+                    anchors.leftMargin: 14
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: 10
+                    Icon { anchors.verticalCenter: parent.verticalCenter; text: "󰸉"; size: 18; color: Theme.accent; hoverable: false }
+                    Txt { anchors.verticalCenter: parent.verticalCenter; text: modelData.replace(Quickshell.env("HOME"), "~"); size: 13 }
+                }
+                HoverHandler { id: impHov }
+                TapHandler {
+                    onTapped: {
+                        Sounds.play("click")
+                        CurrentTheme.importFile(modelData)
+                    }
+                }
+            }
         }
     }
 
@@ -160,6 +226,30 @@ echo OK`, "sh", CurrentTheme.userRoot, s, pick, title.replace(/"/g, "'"), newCol
                         onClicked: {
                             Sounds.play("click")
                             CurrentTheme.apply(tcard.modelData)
+                        }
+                    }
+                    Rectangle {
+                        anchors.right: parent.right
+                        anchors.rightMargin: CurrentTheme.themes.length > 1 ? 40 : 6
+                        anchors.top: parent.top
+                        anchors.topMargin: 6
+                        width: 28
+                        height: 28
+                        radius: 14
+                        color: shareHov.hovered ? Theme.accent : Theme.alpha(Theme.base, 0.7)
+                        Icon {
+                            anchors.centerIn: parent
+                            text: "󰒗"
+                            size: 15
+                            hoverable: false
+                            color: shareHov.hovered ? Theme.base : "#ffffff"
+                        }
+                        HoverHandler { id: shareHov }
+                        TapHandler {
+                            onTapped: {
+                                Sounds.play("click")
+                                CurrentTheme.exportTheme(tcard.modelData)
+                            }
                         }
                     }
                     Rectangle {

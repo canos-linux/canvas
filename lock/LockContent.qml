@@ -159,7 +159,7 @@ Item {
             Txt { anchors.verticalCenter: parent.verticalCenter; text: Power.percent + "%"; size: 14 }
         }
         Txt {
-            visible: Media.player !== null && Media.title !== ""
+            visible: Media.player !== null && Media.title !== "" && !Config.opt.lockMusic
             anchors.verticalCenter: parent.verticalCenter
             text: "󰎈  " + Media.title
             size: 14
@@ -171,6 +171,11 @@ Item {
             size: 14
             color: Theme.subtext
         }
+    }
+
+    LockExtras {
+        anchors.fill: parent
+        opacity: clockCol.opacity
     }
 
     ParallelAnimation {

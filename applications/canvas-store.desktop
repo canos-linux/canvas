@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Canvas Store
+Name[de]=Canvas Store
+Comment=Install apps and games
+Comment[de]=Apps und Spiele installieren
+Exec=canvas store
+Icon=system-software-install
+Categories=System;PackageManager;
+Keywords=store;apps;install;software;programme;

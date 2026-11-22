@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Widgets
 import "../core"
+import "../services"
 import "../ui"
 
 Item {

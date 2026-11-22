@@ -27,6 +27,24 @@ Singleton {
     property real btPopBattery: -1
     property string powerAction: ""
     property bool overview: false
+    property string clipTab: "clip"
+
+    // Do not disturb by schedule: night 22–7, school Mon–Fri 8–16
+    function dndScheduled() {
+        const m = Config.opt.dndSchedule
+        if (m === "off") return false
+        const d = new Date()
+        const h = d.getHours()
+        const night = h >= 22 || h < 7
+        const school = d.getDay() >= 1 && d.getDay() <= 5 && h >= 8 && h < 16
+        return (m === "night" || m === "both") && night || (m === "school" || m === "both") && school
+    }
+
+    function openEmoji() {
+        clipTab = "emoji"
+        if (overlay === "clip") overlay = ""
+        overlay = "clip"
+    }
     property int timerLeft: 0
     property int timerTotal: 0
 
@@ -109,7 +127,7 @@ Singleton {
     }
 
     function show(e) {
-        if ((Config.opt.dnd || Gaming.blocksNotifs) && !e.urgent) return
+        if ((Config.opt.dnd || Gaming.blocksNotifs || dndScheduled()) && !e.urgent) return
         Sounds.play("notif")
         notifEntry = e
         notifApp = e.app
@@ -125,9 +143,9 @@ Singleton {
     }
 
     function openClipboard() {
-        launcherPrefix = ";"
-        if (overlay === "launcher") overlay = ""
-        overlay = "launcher"
+        clipTab = "clip"
+        if (overlay === "clip") overlay = ""
+        overlay = "clip"
     }
 
     function startShot() {

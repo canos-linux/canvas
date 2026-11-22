@@ -103,6 +103,10 @@ Singleton {
             property string hiddenThemes: ""
             property string themeAccents: "{}"
             property string widgetPos: "{}"
+            property bool lockMusic: true
+            property bool lockNotifs: true
+            property bool lockWeather: true
+            property string dndSchedule: "off"
         }
     }
 }

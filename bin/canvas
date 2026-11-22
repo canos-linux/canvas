@@ -33,8 +33,11 @@ case "$1" in
     settings)
         if [ -n "$2" ]; then qs -p "$dir/shell.qml" ipc call island settingspage "$2"; else qs -p "$dir/shell.qml" ipc call island settings; fi
         ;;
-    launcher|themes|center|lock|lockpreview|power|wifi|bluetooth|audio|micmute|nightlight|profile|nightlight|profile|charge|clipboard|screenshot|welcome|powerpreview|identify|overview|record|recordregion|gaming|quick)
+    launcher|themes|center|lock|lockpreview|power|wifi|bluetooth|audio|micmute|nightlight|profile|nightlight|profile|charge|clipboard|screenshot|welcome|powerpreview|identify|overview|record|recordregion|gaming|quick|store|emoji)
         qs -p "$dir/shell.qml" ipc call island "$1"
+        ;;
+    import)
+        f="$(readlink -f "$2")"; qs -p "$dir/shell.qml" ipc call island importtheme "$f"
         ;;
     timer)
         qs -p "$dir/shell.qml" ipc call island timer "${2:-300}"
@@ -47,6 +50,6 @@ case "$1" in
         qs -p "$dir/shell.qml" ipc call island notify "${2:-Canvas}" "${3:-Test}" "${4:-}"
         ;;
     *)
-        echo "canvas start|stop|restart|log|launcher|themes|center|settings [page]|lock|lockpreview|power|wifi|bluetooth|clipboard|screenshot|overview|record|recordregion|gaming|quick|timer <sec>|welcome|theme <name>|notify <app> <title> <text>"
+        echo "canvas start|stop|restart|log|launcher|themes|center|settings [page]|lock|lockpreview|power|wifi|bluetooth|clipboard|screenshot|overview|record|recordregion|gaming|quick|store|emoji|import <file.canostheme>|timer <sec>|welcome|theme <name>|notify <app> <title> <text>"
         ;;
 esac
