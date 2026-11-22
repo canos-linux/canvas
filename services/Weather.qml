@@ -41,7 +41,9 @@ city="$1"
 if [ -n "$city" ]; then
   g=$(curl -fsm 10 "https://geocoding-api.open-meteo.com/v1/search?count=1&name=$(printf '%s' "$city" | sed 's/ /%20/g')") || exit 1
 else
-  g=$(curl -fsm 10 "https://ipapi.co/json/" | sed 's/"city"/"name"/') || exit 1
+  g=$(curl -fsm 10 "http://ip-api.com/json/?fields=city,lat,lon" | sed 's/"city"/"name"/; s/"lat"/"latitude"/; s/"lon"/"longitude"/')
+  printf '%s' "$g" | grep -q latitude || g=$(curl -fsm 10 "https://ipwho.is/" | sed 's/"city"/"name"/')
+  printf '%s' "$g" | grep -q latitude || exit 1
 fi
 lat=$(printf '%s' "$g" | grep -o '"latitude": *[-0-9.]*' | head -1 | grep -o '[-0-9.]*$')
 lon=$(printf '%s' "$g" | grep -o '"longitude": *[-0-9.]*' | head -1 | grep -o '[-0-9.]*$')
