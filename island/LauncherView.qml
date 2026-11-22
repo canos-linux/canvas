@@ -31,6 +31,15 @@ Item {
         }
     }
 
+    // desktop entries load in the background: refresh once they are there (first open after login)
+    Connections {
+        target: DesktopEntries.applications
+        function onValuesChanged() {
+            if (lv.active && lv.tab === "apps") lv.update()
+        }
+    }
+    Component.onCompleted: DesktopEntries.applications.values.length
+
     Timer {
         id: focusTimer
         interval: 60
@@ -208,7 +217,6 @@ Item {
                 list.push({ kind: "app", name: e.name, sub: e.genericName || e.comment || "", icon: e.icon, entry: e })
         }
         results = list.slice(0, 7)
-        console.log("launcher: tab", lv.tab, "query", JSON.stringify(raw), "results", results.length, "apps", DesktopEntries.applications.values.length)
         sel = 0
     }
 
